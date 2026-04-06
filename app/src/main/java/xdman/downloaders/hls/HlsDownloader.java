@@ -21,7 +21,6 @@ import xdman.downloaders.Segment;
 import xdman.downloaders.SegmentDetails;
 import xdman.downloaders.SegmentImpl;
 import xdman.downloaders.SegmentInfo;
-import xdman.downloaders.SegmentListener;
 import xdman.downloaders.http.HttpChannel;
 import xdman.downloaders.metadata.HlsMetadata;
 import xdman.downloaders.metadata.HttpMetadata;
@@ -33,7 +32,7 @@ import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
 
-public class HlsDownloader extends Downloader implements SegmentListener, MediaConversionListener, HlsEncryptedSouce {
+public class HlsDownloader extends Downloader implements MediaConversionListener, HlsEncryptedSouce {
 	private HlsMetadata metadata;
 	private ArrayList<HlsPlaylistItem> items;
 	private Segment manifestSegment;

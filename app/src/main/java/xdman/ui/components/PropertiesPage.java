@@ -1,6 +1,5 @@
 package xdman.ui.components;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
@@ -57,7 +56,7 @@ public class PropertiesPage extends Page {
 		y += getScaledInt(10);
 		h = getScaledInt(30);
 		JLabel lblFileTitle = new JLabel(StringResource.get("ND_FILE"));
-		lblFileTitle.setForeground(Color.WHITE);
+		lblFileTitle.setForeground(ColorResource.getDeepFontColor());
 		lblFileTitle.setFont(FontResource.getNormalFont());
 		lblFileTitle.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(30), h);
 		panel.add(lblFileTitle);
@@ -65,16 +64,16 @@ public class PropertiesPage extends Page {
 		h = getScaledInt(25);
 		txtDefFile = new JTextField();
 		txtDefFile.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(50), h);
-		txtDefFile.setBorder(new LineBorder(ColorResource.getDarkBtnColor()));
+		txtDefFile.setBorder(new LineBorder(ColorResource.getBorderColor()));
 		txtDefFile.setEditable(false);
-		txtDefFile.setForeground(Color.WHITE);
+		txtDefFile.setForeground(ColorResource.getDeepFontColor());
 		txtDefFile.setOpaque(false);
 		panel.add(txtDefFile);
 		y += h;
 
 		h = getScaledInt(30);
 		JLabel lblFolderTitle = new JLabel(StringResource.get("CD_LOC"));
-		lblFolderTitle.setForeground(Color.WHITE);
+		lblFolderTitle.setForeground(ColorResource.getDeepFontColor());
 		lblFolderTitle.setFont(FontResource.getNormalFont());
 		lblFolderTitle.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(50), h);
 		panel.add(lblFolderTitle);
@@ -82,16 +81,16 @@ public class PropertiesPage extends Page {
 		h = getScaledInt(25);
 		txtDefFolder = new JTextField();
 		txtDefFolder.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(50), h);
-		txtDefFolder.setBorder(new LineBorder(ColorResource.getDarkBtnColor()));
+		txtDefFolder.setBorder(new LineBorder(ColorResource.getBorderColor()));
 		txtDefFolder.setEditable(false);
-		txtDefFolder.setForeground(Color.WHITE);
+		txtDefFolder.setForeground(ColorResource.getDeepFontColor());
 		txtDefFolder.setOpaque(false);
 		panel.add(txtDefFolder);
 		y += h;
 
 		h = getScaledInt(30);
 		JLabel lblUrlTitle = new JLabel(StringResource.get("ND_ADDRESS"));
-		lblUrlTitle.setForeground(Color.WHITE);
+		lblUrlTitle.setForeground(ColorResource.getDeepFontColor());
 		lblUrlTitle.setFont(FontResource.getNormalFont());
 		lblUrlTitle.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(50), h);
 		panel.add(lblUrlTitle);
@@ -99,22 +98,22 @@ public class PropertiesPage extends Page {
 		h = getScaledInt(25);
 		txtUrl = new JTextField();
 		txtUrl.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(50), h);
-		txtUrl.setBorder(new LineBorder(ColorResource.getDarkBtnColor()));
+		txtUrl.setBorder(new LineBorder(ColorResource.getBorderColor()));
 		txtUrl.setEditable(false);
-		txtUrl.setForeground(Color.WHITE);
+		txtUrl.setForeground(ColorResource.getDeepFontColor());
 		txtUrl.setOpaque(false);
 		panel.add(txtUrl);
 		y += h;
 
 		h = getScaledInt(30);
 		JLabel lblSizeLabel = new JLabel(StringResource.get("PROP_SIZE"));
-		lblSizeLabel.setForeground(Color.WHITE);
+		lblSizeLabel.setForeground(ColorResource.getDeepFontColor());
 		lblSizeLabel.setFont(FontResource.getNormalFont());
 		lblSizeLabel.setBounds(getScaledInt(15), y, getScaledInt(100), h);
 		panel.add(lblSizeLabel);
 
 		lblSize = new JLabel();
-		lblSize.setForeground(Color.WHITE);
+		lblSize.setForeground(ColorResource.getDeepFontColor());
 		lblSize.setFont(FontResource.getNormalFont());
 		lblSize.setBounds(getScaledInt(115), y, getScaledInt(200), h);
 		panel.add(lblSize);
@@ -122,13 +121,13 @@ public class PropertiesPage extends Page {
 
 		h = getScaledInt(30);
 		JLabel lblDateLabel = new JLabel(StringResource.get("PROP_DATE"));
-		lblDateLabel.setForeground(Color.WHITE);
+		lblDateLabel.setForeground(ColorResource.getDeepFontColor());
 		lblDateLabel.setFont(FontResource.getNormalFont());
 		lblDateLabel.setBounds(getScaledInt(15), y, getScaledInt(100), h);
 		panel.add(lblDateLabel);
 
 		lblDate = new JLabel();
-		lblDate.setForeground(Color.WHITE);
+		lblDate.setForeground(ColorResource.getDeepFontColor());
 		lblDate.setFont(FontResource.getNormalFont());
 		lblDate.setBounds(getScaledInt(115), y, getScaledInt(200), h);
 		panel.add(lblDate);
@@ -136,13 +135,13 @@ public class PropertiesPage extends Page {
 
 		h = getScaledInt(30);
 		JLabel lblTypeLabel = new JLabel(StringResource.get("PROP_TYPE"));
-		lblTypeLabel.setForeground(Color.WHITE);
+		lblTypeLabel.setForeground(ColorResource.getDeepFontColor());
 		lblTypeLabel.setFont(FontResource.getNormalFont());
 		lblTypeLabel.setBounds(getScaledInt(15), y, getScaledInt(100), h);
 		panel.add(lblTypeLabel);
 
 		lblType = new JLabel();
-		lblType.setForeground(Color.WHITE);
+		lblType.setForeground(ColorResource.getDeepFontColor());
 		lblType.setFont(FontResource.getNormalFont());
 		lblType.setBounds(getScaledInt(115), y, getScaledInt(200), h);
 		panel.add(lblType);
@@ -150,13 +149,13 @@ public class PropertiesPage extends Page {
 
 		h = getScaledInt(30);
 		JLabel lblRefererLabel = new JLabel(StringResource.get("PROP_REFERER"));
-		lblRefererLabel.setForeground(Color.WHITE);
+		lblRefererLabel.setForeground(ColorResource.getDeepFontColor());
 		lblRefererLabel.setFont(FontResource.getNormalFont());
 		lblRefererLabel.setBounds(getScaledInt(15), y, getScaledInt(100), h);
 		panel.add(lblRefererLabel);
 
 		lblReferer = new JTextField();
-		lblReferer.setForeground(Color.WHITE);
+		lblReferer.setForeground(ColorResource.getDeepFontColor());
 		lblReferer.setFont(FontResource.getNormalFont());
 		lblReferer.setEditable(false);
 		lblReferer.setBorder(null);
@@ -166,7 +165,7 @@ public class PropertiesPage extends Page {
 		y += h;
 		h = getScaledInt(30);
 		JLabel lblCookieTitle = new JLabel(StringResource.get("PROP_COOKIE"));
-		lblCookieTitle.setForeground(Color.WHITE);
+		lblCookieTitle.setForeground(ColorResource.getDeepFontColor());
 		lblCookieTitle.setFont(FontResource.getNormalFont());
 		lblCookieTitle.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(30), h);
 		panel.add(lblCookieTitle);
@@ -176,9 +175,9 @@ public class PropertiesPage extends Page {
 
 		txtCookie = new JTextArea();
 		txtCookie.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(50), h);
-		txtCookie.setBorder(new LineBorder(ColorResource.getDarkBtnColor()));
+		txtCookie.setBorder(new LineBorder(ColorResource.getBorderColor()));
 		txtCookie.setEditable(false);
-		txtCookie.setForeground(Color.WHITE);
+		txtCookie.setForeground(ColorResource.getDeepFontColor());
 		txtCookie.setOpaque(false);
 		panel.add(txtCookie);
 		y += h;

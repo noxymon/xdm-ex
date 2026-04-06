@@ -3,11 +3,8 @@ package xdman.ui.components;
 import static xdman.util.XDMUtils.getScaledInt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -73,7 +70,7 @@ public class VideoPopup extends JDialog implements ActionListener, Comparator<Vi
 			cb.setHorizontalAlignment(JButton.LEFT);
 			cb.setHorizontalTextPosition(JButton.LEFT);
 			cb.setMargin(new Insets(0, 0, 0, 0));
-			cb.setForeground(Color.WHITE);
+			cb.setForeground(ColorResource.getDeepFontColor());
 			cb.setName(metadata.getId());
 			cb.setText(item.toString());
 			cb.setBackground(ColorResource.getDarkestBgColor());
@@ -136,16 +133,6 @@ public class VideoPopup extends JDialog implements ActionListener, Comparator<Vi
 			setType(Type.UTILITY);
 			setAlwaysOnTop(true);
 
-			try {
-				if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-						.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT)) {
-					if (!Config.getInstance().isNoTransparency()) {
-						setOpacity(0.85f);
-					}
-				}
-			} catch (Exception e) {
-				Logger.log(e);
-			}
 
 			panel = new JPanel(new BorderLayout());
 			panel.setBackground(ColorResource.getDarkestBgColor());
@@ -176,7 +163,7 @@ public class VideoPopup extends JDialog implements ActionListener, Comparator<Vi
 			popupBtn.setPreferredSize(new Dimension(getScaledInt(200), getScaledInt(40)));
 			popupBtn.setMinimumSize(new Dimension(getScaledInt(200), getScaledInt(40)));
 			popupBtn.setBorderPainted(false);
-			popupBtn.setForeground(Color.WHITE);
+			popupBtn.setForeground(ColorResource.getDeepFontColor());
 			popupBtn.setText("DOWNLOAD VIDEO");
 			popupBtn.setFocusPainted(false);
 			popupBtn.setName("EXPAND");
@@ -233,7 +220,7 @@ public class VideoPopup extends JDialog implements ActionListener, Comparator<Vi
 			btn.setName("MORE_FORMAT");
 			btn.addActionListener(this);
 			btn.setMargin(new Insets(0, 0, 0, 0));
-			btn.setForeground(Color.WHITE);
+			btn.setForeground(ColorResource.getDeepFontColor());
 			btn.setBackground(ColorResource.getDarkestBgColor());
 			btn.setBorderPainted(false);
 			btn.setFocusPainted(false);

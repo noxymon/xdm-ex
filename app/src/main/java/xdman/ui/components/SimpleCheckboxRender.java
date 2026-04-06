@@ -18,7 +18,7 @@ public class SimpleCheckboxRender extends JCheckBox implements ListCellRenderer<
 	private static final long serialVersionUID = 2719764994839662332L;
 
 	public SimpleCheckboxRender() {
-		setForeground(Color.WHITE);
+		setForeground(ColorResource.getDeepFontColor());
 		setFont(FontResource.getNormalFont());
 		setOpaque(true);
 		setPreferredSize(new Dimension(getScaledInt(100), getScaledInt(30)));
@@ -32,8 +32,10 @@ public class SimpleCheckboxRender extends JCheckBox implements ListCellRenderer<
 			boolean isSelected, boolean cellHasFocus) {
 		if (isSelected) {
 			setBackground(ColorResource.getSelectionColor());
+			setForeground(ColorResource.getSelectionForeground());
 		} else {
-			setBackground(ColorResource.getDarkerBgColor());
+			setBackground(ColorResource.getTableBackground());
+			setForeground(ColorResource.getDeepFontColor());
 		}
 		if (value != null) {
 			setSelected(((BatchItem) value).selected);

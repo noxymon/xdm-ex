@@ -13,9 +13,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
-import javax.swing.JOptionPane;
+
+
 
 import xdman.Config;
 import xdman.MonitoringListener;
@@ -72,20 +72,11 @@ public class TrayHandler {
 				} else if ("ADD_VID".equals(name)) {
 					MediaDownloaderWnd wnd = new MediaDownloaderWnd();
 					wnd.setVisible(true);
-				} else if ("THROTTLE".equals(name)) {
-					int ret = SpeedLimiter.getSpeedLimit();
-					if (ret >= 0) {
-						Config.getInstance().setSpeedLimit(ret);
-					}
 				} else if ("ADD_BAT".equals(name)) {
 					new BatchPatternDialog().setVisible(true);
 				} else if ("ADD_CLIP".equals(name)) {
-					List<String> urlList = BatchDownloadWnd.getUrls();
-					if (urlList.size() > 0) {
-						new BatchDownloadWnd(XDMUtils.toMetadata(urlList)).setVisible(true);
-					} else {
-						JOptionPane.showMessageDialog(null, StringResource.get("LBL_BATCH_EMPTY_CLIPBOARD"));
-					}
+					ClipboardPasteWnd wnd = new ClipboardPasteWnd();
+					wnd.setVisible(true);
 				} else if ("MONITORING".equals(name)) {
 				}
 			}

@@ -1,23 +1,15 @@
 package xdman.ui.res;
 
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.image.BaseMultiResolutionImage;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.MultiResolutionImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import xdman.XDMConstants;
-import xdman.util.XDMUtils;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 public class ImageResource {
 //	private final static String ICON_FOLDER = "icons";
@@ -51,49 +43,63 @@ public class ImageResource {
 		return null;
 	}
 
-	public static Icon getIcon(String icon, int width, int height) {
-		try {
-			BufferedImage image = ImageIO.read(ImageResource.class.getResource("/icons/xxhdpi/" + icon));
-			BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	public static Icon getIcon(String name, int width, int height) {
+		// Try SVG first
+		String svgName = name.replace(".png", ".svg");
+		Icon svgIcon = getSVGIcon(svgName, width, height);
+		if (svgIcon != null) {
+			return svgIcon;
+		}
 
-			//System.out.println("------*** " + image.getWidth() + " " + width);
+		try {
+			URL resource = ImageResource.class.getResource("/icons/xxhdpi/" + name);
+			if (resource == null)
+				return new ImageIcon();
+
+			BufferedImage image = ImageIO.read(resource);
+			BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 			Graphics2D g2 = scaledImage.createGraphics();
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g2.drawImage(image, 0, 0, width, height, new ImageObserver() {
-				@Override
-				public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-					return true;
-				}
-			});
+			g2.drawImage(image, 0, 0, width, height, null);
 			g2.dispose();
 			image.flush();
-			return new Icon() {
 
-				@Override
-				public void paintIcon(Component c, Graphics g, int x, int y) {
-					Graphics2D g2 = (Graphics2D) g.create();
-					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-					g2.drawImage(scaledImage, x, y, c);
-					g2.dispose();
+			// Auto-invert if light mode is active (since source icons are white/light)
+			if (!com.formdev.flatlaf.FlatLaf.isLafDark()) {
+				for (int y = 0; y < scaledImage.getHeight(); y++) {
+					for (int x = 0; x < scaledImage.getWidth(); x++) {
+						int rgba = scaledImage.getRGB(x, y);
+						int a = (rgba >> 24) & 0xFF;
+						if (a > 0) {
+							int r = 255 - ((rgba >> 16) & 0xFF);
+							int g = 255 - ((rgba >> 8) & 0xFF);
+							int b = 255 - (rgba & 0xFF);
+							scaledImage.setRGB(x, y, (a << 24) | (r << 16) | (g << 8) | b);
+						}
+					}
 				}
+			}
 
-				@Override
-				public int getIconWidth() {
-					return width;
-				}
-
-				@Override
-				public int getIconHeight() {
-					return height;
-				}
-			};
+			return new ImageIcon(scaledImage);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new ImageIcon();
 		}
+	}
+
+	public static Icon getSVGIcon(String name, int width, int height) {
+		try {
+			// Expected path: /icons/svg/name.svg
+			String path = "icons/svg/" + name;
+			URL url = ImageResource.class.getResource("/" + path);
+			if (url != null) {
+				return new FlatSVGIcon(path, width, height);
+			}
+		} catch (Exception e) {
+			// SVG not found or error loading
+		}
+		return null;
 	}
 
 //	private static ImageIcon getIcon(String name) {

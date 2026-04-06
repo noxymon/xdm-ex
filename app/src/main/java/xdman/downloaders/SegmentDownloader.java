@@ -25,7 +25,7 @@ import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
 
-public abstract class SegmentDownloader extends Downloader implements SegmentListener, MediaConversionListener {
+public abstract class SegmentDownloader extends Downloader implements MediaConversionListener {
 	private boolean init = false;
 	private int MIN_CHUNK_SIZE = 256 * 1024;
 	private boolean assembleFinished;

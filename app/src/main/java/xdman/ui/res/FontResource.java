@@ -10,51 +10,62 @@ public class FontResource {
 		Logger.log("Loading fonts");
 	}
 
+	private static final String MODERN_FONT = "Inter";
+	private static final String FALLBACK_FONT = "Segoe UI Variable Text";
+
+	private static Font createFont(int style, int size) {
+		Font font = new Font(MODERN_FONT, style, XDMUtils.getScaledInt(size));
+		if (font.getFamily().equalsIgnoreCase("Dialog") || font.getFamily().equalsIgnoreCase("SansSerif")) {
+			font = new Font(FALLBACK_FONT, style, XDMUtils.getScaledInt(size));
+		}
+		return font;
+	}
+
 	public static Font getNormalFont() {
 		if (plainFont == null) {
-			plainFont = new Font(Font.SANS_SERIF, Font.PLAIN, XDMUtils.getScaledInt(12));
+			plainFont = createFont(Font.PLAIN, 12);
 		}
 		return plainFont;
 	}
 
 	public static Font getBoldFont() {
 		if (boldFont == null) {
-			boldFont = new Font(Font.SANS_SERIF, Font.BOLD, XDMUtils.getScaledInt(12));
+			boldFont = createFont(Font.BOLD, 12);
 		}
 		return boldFont;
 	}
 
 	public static Font getBigFont() {
 		if (plainFontBig == null) {
-			plainFontBig = new Font(Font.SANS_SERIF, Font.PLAIN, XDMUtils.getScaledInt(14));
+			plainFontBig = createFont(Font.PLAIN, 14);
 		}
 		return plainFontBig;
 	}
 
 	public static Font getBigBoldFont() {
 		if (boldFont2 == null) {
-			boldFont2 = new Font(Font.SANS_SERIF, Font.BOLD, XDMUtils.getScaledInt(14));
+			boldFont2 = createFont(Font.BOLD, 14);
 		}
 		return boldFont2;
 	}
 
 	public static Font getItemFont() {
 		if (itemFont == null) {
-			itemFont = new Font(Font.SANS_SERIF, Font.PLAIN, XDMUtils.getScaledInt(16));
+			itemFont = createFont(Font.PLAIN, 16);
 		}
 		return itemFont;
 	}
 
 	public static Font getBiggerFont() {
 		if (plainFontBig1 == null) {
-			plainFontBig1 = new Font(Font.SANS_SERIF, Font.PLAIN, XDMUtils.getScaledInt(18));
+			plainFontBig1 = createFont(Font.PLAIN, 18);
 		}
 		return plainFontBig1;
 	}
 
 	public static Font getBiggestFont() {
 		if (plainFontBig2 == null) {
-			plainFontBig2 = new Font(Font.SANS_SERIF, Font.PLAIN, XDMUtils.getScaledInt(24));
+			plainFontBig2 = createFont(Font.PLAIN, 24);
 		}
 		return plainFontBig2;
 	}

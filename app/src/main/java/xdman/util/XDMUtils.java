@@ -2,7 +2,6 @@ package xdman.util;
 
 import java.awt.Desktop;
 import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -17,6 +16,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.io.InputStreamReader;
+
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg;
 
 import xdman.Config;
 import xdman.Main;
@@ -111,16 +114,25 @@ public class XDMUtils {
 
 	public static boolean validateURL(String url) {
 		try {
-			url = url.toLowerCase();
-			if (url.startsWith("http://") || url.startsWith("https://")
-					|| url.startsWith("ftp://")) {
-				new URI(url).toURL();
-				return true;
+			if (url != null) {
+				url = url.trim();
+				if (url.length() > 0) {
+					// Handle spaces and basic sanitization
+					if (url.contains(" ")) {
+						url = url.replace(" ", "%20");
+					}
+					// Ensure protocol
+					if (!url.contains("://")) {
+						url = "http://" + url;
+					}
+					new URI(url).toURL();
+					return true;
+				}
 			}
-			return false;
 		} catch (Exception e) {
-			return false;
+			Logger.log("Invalid URL: " + url);
 		}
+		return false;
 	}
 
 	static String doc[] = { ".doc", ".docx", ".txt", ".pdf", ".rtf", ".xml",
@@ -421,8 +433,15 @@ public class XDMUtils {
 
 	public static String getClipBoardText() {
 		try {
-			return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-					.getData(DataFlavor.stringFlavor);
+			java.awt.datatransfer.Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			java.awt.datatransfer.Transferable contents = clipboard.getContents(null);
+			if (contents != null && contents.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.stringFlavor)) {
+				return (String) contents.getTransferData(java.awt.datatransfer.DataFlavor.stringFlavor);
+			}
+		} catch (java.awt.datatransfer.UnsupportedFlavorException e) {
+			Logger.log("Clipboard format not supported: " + e.getMessage());
+		} catch (java.lang.IllegalStateException e) {
+			Logger.log("Clipboard not available: " + e.getMessage());
 		} catch (Exception e) {
 			Logger.log(e);
 		}
@@ -565,6 +584,42 @@ public class XDMUtils {
 			throw new IOException("Unexpected EOF");
 		}
 		return ln;
+	}
+
+	public static boolean isSystemDark() {
+		int os = detectOS();
+		if (os == WINDOWS) {
+			try {
+				return Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER,
+						"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme")
+						&& Advapi32Util.registryGetIntValue(WinReg.HKEY_CURRENT_USER,
+								"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+								"AppsUseLightTheme") == 0;
+			} catch (Exception e) {
+				return false;
+			}
+		} else if (os == LINUX) {
+			try {
+				Process p = Runtime.getRuntime().exec(new String[] { "gsettings", "get", "org.gnome.desktop.interface", "color-scheme" });
+				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String line = reader.readLine();
+				if (line != null && line.contains("prefer-dark")) {
+					return true;
+				}
+			} catch (Exception e) {
+			}
+		} else if (os == MAC) {
+			try {
+				Process p = Runtime.getRuntime().exec(new String[] { "defaults", "read", "-g", "AppleInterfaceStyle" });
+				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String line = reader.readLine();
+				if (line != null && line.contains("Dark")) {
+					return true;
+				}
+			} catch (Exception e) {
+			}
+		}
+		return false;
 	}
 
 }

@@ -41,7 +41,9 @@ public class Page extends JPanel {
 		this.title = title;
 		this.width = width;
 		this.parent = parent;
-		bgColor = new Color(0, 0, 0, Config.getInstance().isNoTransparency()?255:200);
+		Color bg = javax.swing.UIManager.getColor("Panel.background");
+		if (bg == null) bg = Color.DARK_GRAY;
+		bgColor = new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), Config.getInstance().isNoTransparency()?255:200);
 		MouseInputAdapter ma = new MouseInputAdapter() {
 		};
 

@@ -22,7 +22,6 @@ import xdman.downloaders.SegmentComparator;
 import xdman.downloaders.SegmentDetails;
 import xdman.downloaders.SegmentImpl;
 import xdman.downloaders.SegmentInfo;
-import xdman.downloaders.SegmentListener;
 import xdman.downloaders.http.HttpChannel;
 import xdman.downloaders.metadata.DashMetadata;
 import xdman.downloaders.metadata.HttpMetadata;
@@ -34,7 +33,7 @@ import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
 
-public class DashDownloader extends Downloader implements SegmentListener, MediaConversionListener {
+public class DashDownloader extends Downloader implements MediaConversionListener {
 	private DashMetadata metadata;
 	private long MIN_CHUNK_SIZE = 256 * 1024;
 	private long len1, len2;

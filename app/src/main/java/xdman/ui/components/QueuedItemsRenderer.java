@@ -1,6 +1,5 @@
 package xdman.ui.components;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 
@@ -23,7 +22,7 @@ public class QueuedItemsRenderer extends JLabel implements ListCellRenderer<Stri
 	private static final long serialVersionUID = 1484239790859356321L;
 
 	public QueuedItemsRenderer() {
-		setForeground(Color.WHITE);
+		setForeground(ColorResource.getDeepFontColor());
 		setFont(FontResource.getNormalFont());
 		setOpaque(true);
 		setPreferredSize(new Dimension(getScaledInt(100), getScaledInt(30)));
@@ -35,8 +34,10 @@ public class QueuedItemsRenderer extends JLabel implements ListCellRenderer<Stri
 			boolean isSelected, boolean cellHasFocus) {
 		if (isSelected) {
 			setBackground(ColorResource.getSelectionColor());
+			setForeground(ColorResource.getSelectionForeground());
 		} else {
-			setBackground(ColorResource.getDarkerBgColor());
+			setBackground(ColorResource.getTableBackground());
+			setForeground(ColorResource.getDeepFontColor());
 		}
 		DownloadEntry ent = XDMApp.getInstance().getEntry(value);
 		String str = "";

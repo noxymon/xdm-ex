@@ -1,28 +1,26 @@
 package xdman.ui.components;
 
-import static xdman.util.XDMUtils.getScaledInt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
 
 import xdman.Config;
-import xdman.ui.res.ColorResource;
 import xdman.ui.res.ImageResource;
 import xdman.util.Logger;
 import xdman.util.StringUtils;
+
+import javax.swing.UIManager;
 
 public class XDMFileSelectionPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 2333430406492555559L;
@@ -56,41 +54,31 @@ public class XDMFileSelectionPanel extends JPanel implements ActionListener {
 	}
 
 	private void initUI() {
-		setBackground(ColorResource.getDarkestBgColor());
 		txtFile = new JTextField();
-		setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
-		txtFile.setBackground(ColorResource.getDarkestBgColor());
 		txtFile.setBorder(null);
-		txtFile.setForeground(Color.WHITE);
-		txtFile.setBounds(getScaledInt(77), getScaledInt(111), getScaledInt(241), getScaledInt(20));
-		txtFile.setCaretColor(ColorResource.getSelectionColor());
+		txtFile.setCaretColor(UIManager.getColor("ProgressBar.foreground"));
+		add(txtFile, BorderLayout.CENTER);
 
-		add(txtFile);
-		Box hbox = Box.createHorizontalBox();
 
 		btnBrowse = new CustomButton();
-		btnBrowse.setBackground(ColorResource.getDarkestBgColor());
 		btnBrowse.setIcon(ImageResource.getIcon("folder.png", 16, 16));
-		btnBrowse.setMargin(new Insets(0, 0, 0, 0));
-		btnBrowse.setContentAreaFilled(false);
+		btnBrowse.setMargin(new Insets(2, 2, 2, 2));
 		btnBrowse.setBorderPainted(false);
 		btnBrowse.setFocusPainted(false);
-		btnBrowse.setOpaque(false);
 		btnBrowse.addActionListener(this);
 
 		btnDropdown = new CustomButton();
-		btnDropdown.setBackground(ColorResource.getDarkestBgColor());
-		btnDropdown.setIcon(ImageResource.getIcon("down_white.png",16,16));
-		btnDropdown.setMargin(new Insets(0, 0, 0, 0));
-		btnDropdown.setContentAreaFilled(false);
+		btnDropdown.setIcon(ImageResource.getIcon("down.png", 12, 12));
+		btnDropdown.setMargin(new Insets(2, 2, 2, 2));
 		btnDropdown.setBorderPainted(false);
 		btnDropdown.setFocusPainted(false);
 		btnDropdown.addActionListener(this);
 
-		hbox.add(btnBrowse);
-		hbox.add(btnDropdown);
+		JPanel buttonPanel = new JPanel(new java.awt.GridLayout(1, 2));
+		buttonPanel.add(btnBrowse);
+		buttonPanel.add(btnDropdown);
 
-		add(hbox, BorderLayout.EAST);
+		add(buttonPanel, BorderLayout.EAST);
 		pop = new JPopupMenu();
 		if (!StringUtils.isNullOrEmptyOrBlank(Config.getInstance().getLastFolder())) {
 			pop.add(createMenuItem(Config.getInstance().getLastFolder()));

@@ -1,9 +1,6 @@
 package xdman.ui.components;
 
-import java.awt.Color;
-import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
-import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -40,7 +37,6 @@ import xdman.ui.res.ColorResource;
 import xdman.ui.res.FontResource;
 import xdman.ui.res.ImageResource;
 import xdman.ui.res.StringResource;
-import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
 
@@ -80,13 +76,19 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 	}
 
 	public BatchDownloadWnd(List<HttpMetadata> mdList) {
+		this(mdList, null);
+	}
+
+	public BatchDownloadWnd(List<HttpMetadata> mdList, List<String> fileNames) {
 		fileExts = new HashSet<>();
 		items = new BatchItem[mdList.size()];
 		initUI();
 		for (int i = 0; i < mdList.size(); i++) {
 			HttpMetadata md = mdList.get(i);
 			try {
-				String file = XDMUtils.getFileName(md.getUrl());
+				String file = (fileNames != null && fileNames.size() > i && fileNames.get(i) != null)
+						? fileNames.get(i)
+						: XDMUtils.getFileName(md.getUrl());
 				BatchItem item = new BatchItem();
 				item.file = file;
 				item.selected = true;
@@ -157,16 +159,6 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 
 		setUndecorated(true);
 
-		try {
-			if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-					.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT)) {
-				if (!Config.getInstance().isNoTransparency())
-					setOpacity(0.85f);
-			}
-		} catch (Exception e) {
-			Logger.log(e);
-		}
-
 		setTitle(StringResource.get("MENU_BATCH_DOWNLOAD"));
 		setIconImage(ImageResource.getImage("icon.png"));
 		setSize(getScaledInt(500), getScaledInt(420));
@@ -196,7 +188,7 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 		titlePanel.add(titleLbl);
 
 		JLabel lineLbl = new JLabel();
-		lineLbl.setBackground(ColorResource.getSelectionColor());
+		lineLbl.setBackground(ColorResource.getBorderColor());
 		lineLbl.setBounds(0, getScaledInt(55), getWidth(), 1);
 		lineLbl.setOpaque(true);
 		add(lineLbl);
@@ -235,7 +227,7 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 
 		JLabel lblFileTypes = new JLabel(StringResource.get("LBL_FILE_TYPE"), JLabel.RIGHT);
 		lblFileTypes.setFont(FontResource.getNormalFont());
-		lblFileTypes.setForeground(Color.WHITE);
+		lblFileTypes.setForeground(ColorResource.getDeepFontColor());
 		lblFileTypes.setBounds(0, y, getScaledInt(80), getScaledInt(30));
 		add(lblFileTypes);
 
@@ -271,17 +263,17 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 
 		JLabel lblFile = new JLabel(StringResource.get("LBL_SAVE_IN"), JLabel.RIGHT);
 		lblFile.setFont(FontResource.getNormalFont());
-		lblFile.setForeground(Color.WHITE);
+		lblFile.setForeground(ColorResource.getDeepFontColor());
 		lblFile.setBounds(0, y, getScaledInt(80), getScaledInt(30));
 		add(lblFile);
 
 		txtFile = new JTextField();
-		txtFile.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
+		txtFile.setBorder(new LineBorder(ColorResource.getBorderColor(), 1));
 		txtFile.setBackground(ColorResource.getDarkestBgColor());
-		txtFile.setForeground(Color.WHITE);
+		txtFile.setForeground(ColorResource.getDeepFontColor());
 		txtFile.setBounds(getScaledInt(90), y + getScaledInt(5), getScaledInt(305) - getScaledInt(15),
 				getScaledInt(20));
-		txtFile.setCaretColor(ColorResource.getSelectionColor());
+		txtFile.setCaretColor(ColorResource.getDeepFontColor());
 		txtFile.setText(Config.getInstance().getDownloadFolder());
 		add(txtFile);
 
@@ -291,8 +283,8 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 		browse.setBounds(getScaledInt(410) - getScaledInt(20), y + getScaledInt(5), getScaledInt(40), getScaledInt(20));
 		browse.setFocusPainted(false);
 		browse.setBackground(ColorResource.getDarkestBgColor());
-		browse.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
-		browse.setForeground(Color.WHITE);
+		browse.setBorder(new LineBorder(ColorResource.getBorderColor(), 1));
+		browse.setForeground(ColorResource.getDeepFontColor());
 		browse.addActionListener(this);
 		browse.setFont(FontResource.getItemFont());
 		add(browse);
@@ -301,7 +293,7 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 
 		JLabel lblQueue = new JLabel(StringResource.get("LBL_QUEUE_USE"), JLabel.RIGHT);
 		lblQueue.setFont(FontResource.getNormalFont());
-		lblQueue.setForeground(Color.WHITE);
+		lblQueue.setForeground(ColorResource.getDeepFontColor());
 		lblQueue.setBounds(0, y, getScaledInt(80), getScaledInt(30));
 		add(lblQueue);
 
@@ -321,7 +313,7 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 		chkStartQueue = new JCheckBox(StringResource.get("LBL_START_QUEUE_PROCESSING"));
 		chkStartQueue.setBackground(ColorResource.getDarkestBgColor());
 		chkStartQueue.setName("START_QUEUE");
-		chkStartQueue.setForeground(Color.WHITE);
+		chkStartQueue.setForeground(ColorResource.getDeepFontColor());
 		chkStartQueue.setFocusPainted(false);
 
 		chkStartQueue.setBounds(getScaledInt(15), y, getScaledInt(200), getScaledInt(20));
@@ -357,11 +349,6 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 
 	private JButton createButton(String name) {
 		JButton btn = new CustomButton(StringResource.get(name));
-		btn.setBackground(ColorResource.getDarkBtnColor());
-		btn.setBorderPainted(false);
-		btn.setFocusPainted(false);
-		btn.setForeground(Color.WHITE);
-		btn.setFont(FontResource.getNormalFont());
 		btn.addActionListener(this);
 		return btn;
 	}

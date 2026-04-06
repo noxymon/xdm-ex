@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import xdman.Config;
 import xdman.XDMApp;
 import xdman.network.http.JavaHttpClient;
-import xdman.network.http.XDMHttpClient;
 
 public class UpdateChecker {
 
@@ -41,16 +40,6 @@ public class UpdateChecker {
 
 	private static boolean isAppUpdateAvailable() {
 		return isUpdateAvailable(XDMApp.APP_VERSION);
-	}
-
-	// return 1 is no update required
-	// return 0, -1 if update required
-	private static int isComponentUpdateAvailable() {
-		String componentVersion = getComponentVersion();
-		System.out.println("current component version: " + componentVersion);
-		if (componentVersion == null)
-			return -1;
-		return isUpdateAvailable(componentVersion) ? 0 : 1;
 	}
 
 	public static String getComponentVersion() {

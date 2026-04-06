@@ -20,7 +20,6 @@ import xdman.downloaders.Segment;
 import xdman.downloaders.SegmentDetails;
 import xdman.downloaders.SegmentImpl;
 import xdman.downloaders.SegmentInfo;
-import xdman.downloaders.SegmentListener;
 import xdman.downloaders.http.HttpChannel;
 import xdman.downloaders.metadata.HdsMetadata;
 import xdman.downloaders.metadata.HttpMetadata;
@@ -33,7 +32,7 @@ import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
 
-public class HdsDownloader extends Downloader implements SegmentListener, MediaConversionListener {
+public class HdsDownloader extends Downloader implements MediaConversionListener {
 	private HdsMetadata metadata;
 	private ArrayList<String> urlList;
 	private Segment manifestSegment;

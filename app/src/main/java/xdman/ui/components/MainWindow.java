@@ -3,7 +3,6 @@ package xdman.ui.components;
 import static xdman.util.XDMUtils.getScaledInt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -25,7 +24,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
@@ -48,9 +46,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+
+import com.formdev.flatlaf.FlatClientProperties;
 
 import xdman.Config;
 import xdman.DownloadEntry;
@@ -100,6 +99,12 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		setTitle(XDMApp.XDM_WINDOW_TITLE);
 		setWindowSizeAndPosition();
 		initWindow();
+		addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+				XDMApp.getInstance().exit();
+			}
+		});
 		if (Config.getInstance().isFirstRun()) {
 			SettingsPage.getInstance().showPanel(this, "BTN_MONITORING");
 		}
@@ -115,16 +120,16 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		});
 	}
 
-//	@Override
-//	protected void registerTitlePanel(JPanel panel) {
-//		showTwitterIcon = true;
-//		showFBIcon = true;
-//		showGitHubIcon = true;
-//		fbUrl = "https://www.facebook.com/XDM.subhra74/";
-//		twitterUrl = "https://twitter.com/XDM_subhra74";
-//		gitHubUrl = "https://github.com/subhra74/xdm";
-//		super.registerTitlePanel(panel);
-//	}
+	// @Override
+	// protected void registerTitlePanel(JPanel panel) {
+	// showTwitterIcon = true;
+	// showFBIcon = true;
+	// showGitHubIcon = true;
+	// fbUrl = "https://www.facebook.com/XDM.subhra74/";
+	// twitterUrl = "https://twitter.com/XDM_subhra74";
+	// gitHubUrl = "https://github.com/subhra74/xdm";
+	// super.registerTitlePanel(panel);
+	// }
 
 	private String getQueueName(String str) {
 		if (str == null) {
@@ -360,9 +365,12 @@ public class MainWindow extends XDMFrame implements ActionListener {
 	private void updateSidePanel(JLabel lbl) {
 		for (int i = 0; i < lblCatArr.length; i++) {
 			if (lbl == lblCatArr[i]) {
-				lblCatArr[i].setBackground(ColorResource.getActiveTabColor());
+				lblCatArr[i].setBackground(ColorResource.getSelectionColor());
+				lblCatArr[i].setForeground(ColorResource.getSelectionForeground());
 				lblCatArr[i].setOpaque(true);
 			} else {
+				lblCatArr[i].setBackground(null);
+				lblCatArr[i].setForeground(ColorResource.getDeepFontColor());
 				lblCatArr[i].setOpaque(false);
 			}
 		}
@@ -380,8 +388,7 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		JPanel p = new JPanel(new BorderLayout());
 		Box toolBox = Box.createHorizontalBox();
 		toolBox.add(Box.createRigidArea(new Dimension(scale(20), scale(60))));
-		toolBox.setBackground(ColorResource.getTitleColor());
-		toolBox.setOpaque(true);
+		toolBox.setOpaque(false);
 
 		JButton btn1 = createToolButton("ADD_URL", "tool_add.png");
 		btn1.setToolTipText(StringResource.get("MENU_ADD_URL"));
@@ -425,18 +432,17 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		toolBox.add(Box.createHorizontalGlue());
 
 		btnMonitoring = new JLabel(ImageResource.getIcon("on.png", 85, 21));
-		// btnMonitoring.setForeground(Color.WHITE);
 		btnMonitoring.setIconTextGap(scale(15));
 		btnMonitoring.putClientProperty("xdmbutton.norollover", "true");
-		// btnMonitoring.setBackground(ColorResource.getTitleColor());
 		btnMonitoring.setName("BROWSER_MONITORING");
 		btnMonitoring.setText(StringResource.get("BROWSER_MONITORING"));
 		btnMonitoring.setHorizontalTextPosition(JButton.LEADING);
 		btnMonitoring.setFont(FontResource.getBigFont());
+		btnMonitoring.setForeground(ColorResource.getDeepFontColor());
 
-		btnMonitoring
-				.setIcon(Config.getInstance().isBrowserMonitoringEnabled() ? ImageResource.getIcon("on.png", 85, 21)
-						: ImageResource.getIcon("off.png", 85, 21));
+		btnMonitoring.setIcon(Config.getInstance().isBrowserMonitoringEnabled()
+				? ImageResource.getIcon("on.png", 85, 21)
+				: ImageResource.getIcon("off.png", 85, 21));
 
 		btnMonitoring.addMouseListener(new MouseAdapter() {
 			@Override
@@ -452,13 +458,12 @@ public class MainWindow extends XDMFrame implements ActionListener {
 
 	private JButton createToolButton(String name, String icon) {
 		CustomButton btn = new CustomButton(ImageResource.getIcon(icon, 32, 32));
-		btn.setPressedBackground(ColorResource.getDarkPressedColor());
-		btn.setRolloverBackground(Color.DARK_GRAY);
-		btn.setBorderPainted(false);
-		btn.addActionListener(this);
 		btn.setName(name);
-		btn.setBackground(ColorResource.getTitleColor());
-		btn.setMargin(new Insets(0, 0, 0, 0));
+		btn.putClientProperty(FlatClientProperties.STYLE,
+				"arc: 8;" +
+						"buttonType: toolBarButton");
+		btn.addActionListener(this);
+		btn.setMargin(new Insets(5, 5, 5, 5));
 		return btn;
 	}
 
@@ -502,9 +507,7 @@ public class MainWindow extends XDMFrame implements ActionListener {
 	private void createMainMenu() {
 		JMenuBar bar = new JMenuBar();
 		bar.setBorderPainted(false);
-		bar.setForeground(ColorResource.getWhite());
 		bar.setMaximumSize(new Dimension(bar.getMaximumSize().width, XDMUtils.getScaledInt(30)));
-		bar.setBackground(ColorResource.getTitleColor());
 
 		JMenu file = createMenu(StringResource.get("MENU_FILE"));
 
@@ -575,30 +578,30 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		// bar.setAlignmentX(Box.RIGHT_ALIGNMENT);
 		// bar.setAlignmentY(Box.TOP_ALIGNMENT);
 
-//		Box vbox1=Box.createVerticalBox();
-//		vbox1.setPreferredSize(new Dimension(300, 30));
-//		vbox1.setOpaque(true);
-//		vbox1.setBackground(Color.RED);
-//		vbox1.setMinimumSize(new Dimension(300, 30));
-//		vbox1.add(bar);
-//		vbox1.add(Box.createVerticalGlue());
+		// Box vbox1=Box.createVerticalBox();
+		// vbox1.setPreferredSize(new Dimension(300, 30));
+		// vbox1.setOpaque(true);
+		// vbox1.setBackground(Color.RED);
+		// vbox1.setMinimumSize(new Dimension(300, 30));
+		// vbox1.add(bar);
+		// vbox1.add(Box.createVerticalGlue());
 
-//		JPanel panel = new JPanel(new BorderLayout());
-//		Box hb1 = Box.createHorizontalBox();
-//		hb1.add(Box.createHorizontalGlue());
-//		hb1.add(bar);
-//		hb1.add(Box.createHorizontalStrut(getScaledInt(30)));
-//		panel.add(hb1, BorderLayout.NORTH);
+		// JPanel panel = new JPanel(new BorderLayout());
+		// Box hb1 = Box.createHorizontalBox();
+		// hb1.add(Box.createHorizontalGlue());
+		// hb1.add(bar);
+		// hb1.add(Box.createHorizontalStrut(getScaledInt(30)));
+		// panel.add(hb1, BorderLayout.NORTH);
 
-//
-//		Box menuBox = Box.createHorizontalBox();
-//		menuBox.setOpaque(true);
-//		menuBox.setBackground(Color.RED);
-//		bar.setBackground(Color.RED);
-//		//menuBox.add(Box.createHorizontalGlue());
-//		menuBox.add(bar);
-//		//menuBox.add(Box.createHorizontalStrut(getScaledInt(30)));
-//		getTitlePanel().add(panel);
+		//
+		// Box menuBox = Box.createHorizontalBox();
+		// menuBox.setOpaque(true);
+		// menuBox.setBackground(Color.RED);
+		// bar.setBackground(Color.RED);
+		// //menuBox.add(Box.createHorizontalGlue());
+		// menuBox.add(bar);
+		// //menuBox.add(Box.createHorizontalStrut(getScaledInt(30)));
+		// getTitlePanel().add(panel);
 
 		Box menuBox = Box.createHorizontalBox();
 		menuBox.setBorder(new EmptyBorder(0, 0, getScaledInt(20), 0));
@@ -632,9 +635,7 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		JMenu menu = new JMenu(StringResource.get(id));
 		menu.setName(id);
 		menu.setFont(FontResource.getNormalFont());
-		// menu.setForeground(ColorResource.getLightFontColor());
 		menu.addActionListener(this);
-		// menu.setBackground(ColorResource.getDarkerBgColor());
 		menu.setBorderPainted(false);
 		menu.getPopupMenu().addPopupMenuListener(popupListener);
 		parentMenu.add(menu);
@@ -645,21 +646,22 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		JLabel lblCat = new JLabel(StringResource.get(name));
 		lblCat.setName(name);
 		lblCat.setFont(FontResource.getBigFont());
-		lblCat.setForeground(Color.BLACK);
 		lblCat.setBorder(new EmptyBorder(getScaledInt(5), getScaledInt(20), getScaledInt(5), getScaledInt(5)));
+		lblCat.setForeground(ColorResource.getDeepFontColor());
+		lblCat.putClientProperty(FlatClientProperties.STYLE,
+				"arc: 12;");
 		return lblCat;
 	}
 
 	private CustomButton createDropdownBtn(String textKey) {
 		CustomButton btn = new CustomButton(StringResource.get(textKey));
 		btn.setBackground(ColorResource.getActiveTabColor());
-		btn.setBorderPainted(false);
-		btn.setFocusPainted(false);
-		btn.setContentAreaFilled(false);
+		btn.setArc(12);
 		btn.setIcon(ImageResource.getIcon("down.png", 10, 10));
 		btn.setVerticalTextPosition(SwingConstants.CENTER);
 		btn.setHorizontalTextPosition(SwingConstants.LEFT);
 		btn.setFont(FontResource.getNormalFont());
+		btn.setForeground(ColorResource.getDeepFontColor());
 		return btn;
 	}
 
@@ -676,35 +678,13 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		btnQueue = createDropdownBtn("LBL_ALL_QUEUE");
 
 		txtSearch = new JTextField();
-		txtSearch.setBackground(Color.WHITE);
-		txtSearch.setForeground(Color.BLACK);
-		txtSearch.setBorder(null);
 		txtSearch.setName("BTN_SEARCH");
+		txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, StringResource.get("LBL_SEARCH"));
+		txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
+		txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
+				ImageResource.getIcon("search.png", 16, 16));
+		txtSearch.putClientProperty(FlatClientProperties.STYLE, "arc: 2; focusWidth: 2;");
 		txtSearch.addActionListener(this);
-
-		final CustomButton btnSearch = new CustomButton();
-		btnSearch.setName("BTN_SEARCH");
-		btnSearch.setRolloverBackground(Color.WHITE);
-		btnSearch.setPressedBackground(Color.WHITE);
-		btnSearch.addActionListener(this);
-		btnSearch.setPreferredSize(new Dimension(XDMUtils.getScaledInt(20), XDMUtils.getScaledInt(20)));
-		btnSearch.setBackground(Color.WHITE);
-		btnSearch.setIcon(ImageResource.getIcon("search.png", 18, 18));
-		btnSearch.setBorderPainted(false);
-		btnSearch.setFocusPainted(false);
-
-		txtSearch.addActionListener(this);
-
-		Box b = Box.createHorizontalBox();
-		b.setOpaque(true);
-		b.setBackground(Color.WHITE);
-		b.setPreferredSize(new Dimension(scale(130), scale(20)));
-		b.setMaximumSize(new Dimension(scale(130), scale(20)));
-		txtSearch.setPreferredSize(new Dimension(scale(70), scale(20)));
-		txtSearch.setMaximumSize(new Dimension(txtSearch.getMaximumSize().width, scale(20)));
-		b.add(txtSearch);
-		b.add(btnSearch);
-		b.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
 		Box bp = Box.createHorizontalBox();
 		bp.setOpaque(false);
@@ -713,8 +693,9 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		bp.add(btnQueue);
 		bp.add(Box.createHorizontalGlue());
 		bp.add(btnSort);
-		bp.add(Box.createHorizontalStrut(10));
-		bp.add(b);
+		bp.add(Box.createHorizontalStrut(scale(15)));
+		bp.add(txtSearch);
+		txtSearch.setMaximumSize(new Dimension(scale(220), scale(28)));
 		bp.add(Box.createHorizontalStrut(10));
 
 		sortItems = new JMenuItem[6];
@@ -794,18 +775,19 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		}
 
 		qItems[index].setFont(FontResource.getBoldFont());
-		qItems[index].setForeground(ColorResource.getLightFontColor());
+		qItems[index].setForeground(ColorResource.getDeepFontColor());
 
 		popQ.setInvoker(btnQueue);
 		popQ.show(btnQueue, 0, btnQueue.getHeight());
 	}
 
 	private void updateSortMenu() {
+		int index = Config.getInstance().getSortField();
 		for (int i = 0; i < sortItems.length; i++) {
 			if (i >= 0 && i <= 3) {
-				if (i == Config.getInstance().getSortField()) {
+				if (i == index) {
 					sortItems[i].setFont(FontResource.getBoldFont());
-					sortItems[i].setForeground(ColorResource.getLightFontColor());// (FontResource.getBoldFont());
+					sortItems[i].setForeground(ColorResource.getDeepFontColor());
 				} else {
 					sortItems[i].setFont(FontResource.getNormalFont());
 					sortItems[i].setForeground(ColorResource.getDeepFontColor());
@@ -815,12 +797,10 @@ public class MainWindow extends XDMFrame implements ActionListener {
 
 		sortItems[4]
 				.setFont(Config.getInstance().getSortAsc() ? FontResource.getBoldFont() : FontResource.getNormalFont());
-		sortItems[4].setForeground(Config.getInstance().getSortAsc() ? ColorResource.getLightFontColor()
-				: ColorResource.getDeepFontColor());
+		sortItems[4].setForeground(ColorResource.getDeepFontColor());
 		sortItems[5].setFont(
 				(!Config.getInstance().getSortAsc()) ? FontResource.getBoldFont() : FontResource.getNormalFont());
-		sortItems[5].setForeground((!Config.getInstance().getSortAsc()) ? ColorResource.getLightFontColor()
-				: ColorResource.getDeepFontColor());
+		sortItems[5].setForeground(ColorResource.getDeepFontColor());
 
 	}
 
@@ -844,15 +824,6 @@ public class MainWindow extends XDMFrame implements ActionListener {
 			btnTabArr[i].addActionListener(this);
 		}
 
-		btnAllTab.setBackground(ColorResource.getActiveTabColor());
-		btnAllTab.setForeground(ColorResource.getDarkBgColor());
-
-		btnIncompleteTab.setBackground(ColorResource.getTitleColor());
-		btnIncompleteTab.setForeground(ColorResource.getDeepFontColor());
-
-		btnCompletedTab.setBackground(ColorResource.getTitleColor());
-		btnCompletedTab.setForeground(ColorResource.getDeepFontColor());
-
 		JPanel p = new JPanel(new GridLayout(1, 3, scale(5), 0));
 		p.setBorder(null);
 		p.setOpaque(false);
@@ -860,7 +831,6 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		p.setPreferredSize(d);
 		p.setMaximumSize(d);
 		p.setMinimumSize(d);
-		p.setBackground(Color.WHITE);
 		p.add(btnAllTab);
 		p.add(btnIncompleteTab);
 		p.add(btnCompletedTab);
@@ -875,15 +845,7 @@ public class MainWindow extends XDMFrame implements ActionListener {
 	}
 
 	private void tabClicked(ActionEvent e) {
-		for (int i = 0; i < 3; i++) {
-			if (btnTabArr[i] == e.getSource()) {
-				btnTabArr[i].setBackground(ColorResource.getActiveTabColor());
-				btnTabArr[i].setForeground(ColorResource.getDarkBgColor());
-			} else {
-				btnTabArr[i].setBackground(ColorResource.getTitleColor());
-				btnTabArr[i].setForeground(ColorResource.getDeepFontColor());
-			}
-		}
+		// FlatLaf handle state-based colors for buttons now
 	}
 
 	private void initWindow() {
@@ -909,7 +871,6 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		JLabel lblTitle = new JLabel(XDMApp.XDM_WINDOW_TITLE);
 		lblTitle.setBorder(new EmptyBorder(scale(20), scale(20), scale(20), 0));
 		lblTitle.setFont(FontResource.getBiggestFont());
-		lblTitle.setForeground(ColorResource.getWhite());
 		getTitlePanel().add(lblTitle);
 		this.rightbox = Box.createVerticalBox();
 
@@ -924,7 +885,6 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		bp.add(createSearchPane(), BorderLayout.EAST);
 
 		JPanel panCenter = new JPanel(new BorderLayout());
-		panCenter.setBackground(Color.WHITE);
 		panCenter.add(bp, BorderLayout.NORTH);
 
 		JPanel pClient = new JPanel(new BorderLayout());
@@ -1387,13 +1347,7 @@ public class MainWindow extends XDMFrame implements ActionListener {
 	}
 
 	private void showBatchDialog() {
-		List<String> urlList = BatchDownloadWnd.getUrls();
-		if (urlList.size() > 0) {
-			new BatchDownloadWnd(XDMUtils.toMetadata(urlList)).setVisible(true);
-		} else {
-			MessageBox.show(this, StringResource.get("MENU_BATCH_DOWNLOAD"),
-					StringResource.get("LBL_BATCH_EMPTY_CLIPBOARD"), MessageBox.OK_OPTION, MessageBox.OK);
-		}
+		new ClipboardPasteWnd().setVisible(true);
 	}
 
 	private void optimizeRWin() {
@@ -1409,17 +1363,17 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		obj[1] = cmbLang;
 
 		switch (Config.getInstance().getTcpWindowSize()) {
-		case 64:
-			cmbLang.setSelectedIndex(1);
-			break;
-		case 128:
-			cmbLang.setSelectedIndex(2);
-			break;
-		case 256:
-			cmbLang.setSelectedIndex(3);
-			break;
-		default:
-			cmbLang.setSelectedIndex(0);
+			case 64:
+				cmbLang.setSelectedIndex(1);
+				break;
+			case 128:
+				cmbLang.setSelectedIndex(2);
+				break;
+			case 256:
+				cmbLang.setSelectedIndex(3);
+				break;
+			default:
+				cmbLang.setSelectedIndex(0);
 		}
 
 		if (JOptionPane.showOptionDialog(null, obj, StringResource.get("LBL_OPTIMIZE_NETWORK"),
@@ -1427,17 +1381,17 @@ public class MainWindow extends XDMFrame implements ActionListener {
 			int index = cmbLang.getSelectedIndex();
 			if (index != -1) {
 				switch (index) {
-				case 1:
-					Config.getInstance().setTcpWindowSize(64);
-					break;
-				case 2:
-					Config.getInstance().setTcpWindowSize(128);
-					break;
-				case 3:
-					Config.getInstance().setTcpWindowSize(256);
-					break;
-				default:
-					Config.getInstance().setTcpWindowSize(0);
+					case 1:
+						Config.getInstance().setTcpWindowSize(64);
+						break;
+					case 2:
+						Config.getInstance().setTcpWindowSize(128);
+						break;
+					case 3:
+						Config.getInstance().setTcpWindowSize(256);
+						break;
+					default:
+						Config.getInstance().setTcpWindowSize(0);
 				}
 			}
 		}
@@ -1445,15 +1399,15 @@ public class MainWindow extends XDMFrame implements ActionListener {
 	}
 
 	private void openTranslationPage() {
-		XDMUtils.browseURL("https://github.com/subhra74/xdm/wiki/Submitting-translations-for-XDM");
+		XDMUtils.browseURL("https://github.com/noxymon/xdm-ex/wiki/Submitting-translations-for-XDM-EX");
 	}
 
 	private void openSupportPage() {
-		XDMUtils.browseURL("https://github.com/subhra74/xdm/wiki");
+		XDMUtils.browseURL("https://github.com/noxymon/xdm-ex/wiki");
 	}
 
 	private void openBugReportPage() {
-		XDMUtils.browseURL("https://github.com/subhra74/xdm/issues");
+		XDMUtils.browseURL("https://github.com/noxymon/xdm-ex/issues");
 	}
 
 	private int scale(int i) {

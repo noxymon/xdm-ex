@@ -3,7 +3,6 @@ package xdman.ui.components;
 import java.awt.Graphics;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import xdman.util.StringUtils;

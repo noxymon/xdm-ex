@@ -1,74 +1,84 @@
 package xdman.ui.res;
 
 import java.awt.*;
+import javax.swing.*;
 
 public class ColorResource {
-	private static Color whiteColor = new Color(235, 235, 235);
-	private static Color titleColor = new Color(14, 20, 25);
-	private static Color selectedColor =  new Color(51, 181, 229);
-	private static Color activeTabColor = new Color(242, 242, 242);
-	private static Color darkBgColor = new Color(73, 73, 73);
-	private static Color darkerBgColor = new Color(50, 50, 50);
-	private static Color darkPressedColor = new Color(43, 43, 43);
-	private static Color deepFontColor = new Color(160, 160, 160);
-	private static Color lightFontColor = new Color(190, 190, 190);
-	private static Color darkBtnColor = new Color(73, 73, 73);// new Color(83,
-																// 83, 83);
-	private static Color darkestBgColor = new Color(30, 30, 30);
-
 	public static final Color getActiveTabColor() {
-		return activeTabColor;
+		return UIManager.getColor("List.selectionBackground");
+	}
+
+	public static final Color getSidebarBackground() {
+		return UIManager.getColor("Panel.background");
 	}
 
 	public static final Color getWhite() {
-		return whiteColor;
+		return UIManager.getColor("Panel.background");
 	}
 
 	public static final Color getTitleColor() {
-		return titleColor;
+		return UIManager.getColor("TableHeader.background");
 	}
 
 	public static final Color getSelectionColor() {
-		return selectedColor;
+		return UIManager.getColor("List.selectionBackground");
 	}
 
 	public static final Color getButtonBackColor() {
-		return selectedColor;
+		return UIManager.getColor("Button.background");
 	}
 
 	public static final Color getDarkBgColor() {
-		return darkBgColor;
+		return UIManager.getColor("Panel.background");
 	}
 
 	public static final Color getDarkerBgColor() {
-		return darkerBgColor;
+		return UIManager.getColor("Panel.background");
 	}
 
 	public static Color getDarkPressedColor() {
-		return darkPressedColor;
+		return UIManager.getColor("List.selectionBackground");
 	}
 
 	public static final Color getDeepFontColor() {
-		return deepFontColor;
+		return UIManager.getColor("Label.foreground");
 	}
 
 	public static final Color getLightFontColor() {
-		return lightFontColor;
+		return UIManager.getColor("Label.foreground");
 	}
 
 	public static final Color getDarkBtnColor() {
-		return darkBtnColor;
+		return UIManager.getColor("Button.background");
 	}
 
 	public static final void setDarkBtnColor(Color darkBtnColor) {
-		ColorResource.darkBtnColor = darkBtnColor;
 	}
 
 	public static Color getDarkestBgColor() {
-		return darkestBgColor;
+		return UIManager.getColor("Panel.background");
 	}
 
 	public static void setDarkestBgColor(Color darkestBgColor) {
-		ColorResource.darkestBgColor = darkestBgColor;
+	}
+
+	public static Color getBorderColor() {
+		return UIManager.getColor("Component.borderColor");
+	}
+
+	public static Color getSelectionForeground() {
+		return UIManager.getColor("List.selectionForeground");
+	}
+
+	public static Color getTableBackground() {
+		return UIManager.getColor("Table.background");
+	}
+
+	public static Color getPanelBackground() {
+		return UIManager.getColor("Panel.background");
+	}
+
+	public static Color getLinkColor() {
+		return UIManager.getColor("Component.accentColor");
 	}
 }

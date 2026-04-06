@@ -1,6 +1,5 @@
 package xdman.ui.components;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice.WindowTranslucency;
@@ -108,7 +107,7 @@ public class BrowserAddonDlg extends JDialog implements ActionListener {
 		lblMonitoringTitle.setWrapStyleWord(true);
 		lblMonitoringTitle.setLineWrap(true);
 		lblMonitoringTitle.setEditable(false);
-		lblMonitoringTitle.setForeground(Color.WHITE);
+		lblMonitoringTitle.setForeground(ColorResource.getDeepFontColor());
 		lblMonitoringTitle.setText(this.desc);
 		lblMonitoringTitle.setFont(FontResource.getNormalFont());
 		lblMonitoringTitle.setBounds(getScaledInt(15), y, getScaledInt(370) - getScaledInt(30), h);
@@ -124,10 +123,10 @@ public class BrowserAddonDlg extends JDialog implements ActionListener {
 
 	private JButton createButton1(String name, int x, int y) {
 		JButton btn = new CustomButton(StringResource.get(name));
-		btn.setBackground(ColorResource.getDarkBtnColor());
+		btn.setBackground(ColorResource.getButtonBackColor());
 		btn.setBorderPainted(false);
 		btn.setFocusPainted(false);
-		btn.setForeground(Color.WHITE);
+		btn.setForeground(ColorResource.getDeepFontColor());
 		btn.setFont(FontResource.getNormalFont());
 		Dimension d = btn.getPreferredSize();
 		btn.setBounds(x, y, d.width, d.height);

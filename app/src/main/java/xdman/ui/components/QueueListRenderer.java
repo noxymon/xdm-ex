@@ -2,7 +2,6 @@ package xdman.ui.components;
 
 import static xdman.util.XDMUtils.getScaledInt;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 
@@ -23,7 +22,7 @@ public class QueueListRenderer extends JLabel implements
 	private static final long serialVersionUID = 7780698184295073136L;
 
 	public QueueListRenderer() {
-		setForeground(Color.WHITE);
+		setForeground(ColorResource.getDeepFontColor());
 		setFont(FontResource.getNormalFont());
 		setOpaque(true);
 		setPreferredSize(new Dimension(getScaledInt(100), getScaledInt(30)));
@@ -36,8 +35,10 @@ public class QueueListRenderer extends JLabel implements
 			int index, boolean isSelected, boolean cellHasFocus) {
 		if (isSelected) {
 			setBackground(ColorResource.getSelectionColor());
+			setForeground(ColorResource.getSelectionForeground());
 		} else {
-			setBackground(ColorResource.getDarkerBgColor());
+			setBackground(ColorResource.getTableBackground());
+			setForeground(ColorResource.getDeepFontColor());
 		}
 		setText(value.getName());
 		return this;

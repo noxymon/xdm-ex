@@ -21,13 +21,13 @@ public class XDMTableCellRenderer implements TableCellRenderer {
 
 	public XDMTableCellRenderer() {
 		titleLbl = new JLabel("This is sample title text");
-		titleLbl.setForeground(Color.BLACK);
+		titleLbl.setForeground(ColorResource.getDeepFontColor());
 		iconLbl = new JLabel();
-		iconLbl.setForeground(Color.BLACK);
+		iconLbl.setForeground(ColorResource.getDeepFontColor());
 		statLbl = new JLabel("This is sample status text");
-		statLbl.setForeground(Color.BLACK);
+		statLbl.setForeground(ColorResource.getDeepFontColor());
 		dateLbl = new JLabel("Yesterday");
-		dateLbl.setForeground(Color.BLACK);
+		dateLbl.setForeground(ColorResource.getDeepFontColor());
 		lineLbl = new JLabel();
 
 		iconLbl.setOpaque(false);
@@ -43,30 +43,30 @@ public class XDMTableCellRenderer implements TableCellRenderer {
 		iconLbl.setIcon(iconMap.get("document.png"));
 		// iconLbl.setBorder(new EmptyBorder(5,5,5,5));
 
-		titleLbl.setBackground(Color.WHITE);
+		titleLbl.setBackground(ColorResource.getTableBackground());
 		titleLbl.setFont(FontResource.getItemFont());
 		titleLbl.setOpaque(false);
 		// title.setPreferredSize(new Dimension(64, 64));
 
-		statLbl.setBackground(Color.WHITE);
+		statLbl.setBackground(ColorResource.getTableBackground());
 		statLbl.setFont(FontResource.getNormalFont());
 		statLbl.setOpaque(false);
 		// status.setPreferredSize(new Dimension(64, 64));
 
-		dateLbl.setBackground(Color.WHITE);
+		dateLbl.setBackground(ColorResource.getTableBackground());
 		dateLbl.setOpaque(false);
 		dateLbl.setFont(FontResource.getNormalFont());
 		// date.setPreferredSize(new Dimension(64, 64));
 
 		lineLbl = new JLabel();
-		lineLbl.setBackground(ColorResource.getWhite());
+		lineLbl.setBackground(ColorResource.getBorderColor());
 		lineLbl.setOpaque(true);
 		lineLbl.setMinimumSize(new Dimension(10, 1));
 		lineLbl.setMaximumSize(new Dimension(lineLbl.getMaximumSize().width, 1));
 		lineLbl.setPreferredSize(new Dimension(lineLbl.getPreferredSize().width, 1));
 
 		pcell = new JPanel(new BorderLayout());
-		pcell.setBackground(Color.WHITE);
+		pcell.setBackground(ColorResource.getTableBackground());
 
 		pcell.add(iconLbl, BorderLayout.WEST);
 
@@ -96,15 +96,15 @@ public class XDMTableCellRenderer implements TableCellRenderer {
 		if (isSelected) {
 			pcell.setBackground(ColorResource.getSelectionColor());
 			lineLbl.setOpaque(false);
-			titleLbl.setForeground(Color.WHITE);
-			dateLbl.setForeground(Color.WHITE);
-			statLbl.setForeground(Color.WHITE);
+			titleLbl.setForeground(ColorResource.getSelectionForeground());
+			dateLbl.setForeground(ColorResource.getSelectionForeground());
+			statLbl.setForeground(ColorResource.getSelectionForeground());
 		} else {
-			pcell.setBackground(Color.WHITE);
+			pcell.setBackground(ColorResource.getTableBackground());
 			lineLbl.setOpaque(true);
-			titleLbl.setForeground(Color.BLACK);
-			dateLbl.setForeground(Color.BLACK);
-			statLbl.setForeground(Color.BLACK);
+			titleLbl.setForeground(ColorResource.getDeepFontColor());
+			dateLbl.setForeground(ColorResource.getDeepFontColor());
+			statLbl.setForeground(ColorResource.getDeepFontColor());
 		}
 		switch (ent.getCategory()) {
 		case XDMConstants.DOCUMENTS:

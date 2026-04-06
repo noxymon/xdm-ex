@@ -2,7 +2,6 @@ package xdman.ui.components;
 
 import static xdman.util.XDMUtils.getScaledInt;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
@@ -121,13 +120,14 @@ public class MessageBox extends JPanel implements ActionListener {
 		txtMessage = new JTextArea();
 		txtMessage.setWrapStyleWord(true);
 		txtMessage.setLineWrap(true);
-		txtMessage.setBackground(ColorResource.getDarkerBgColor());
-		txtMessage.setForeground(Color.WHITE);
+		txtMessage.setOpaque(false);
+		txtMessage.setForeground(ColorResource.getDeepFontColor());
+		txtMessage.setFont(FontResource.getNormalFont());
 		txtMessage.setBorder(
 				new EmptyBorder(new Insets(getScaledInt(10), getScaledInt(10), getScaledInt(10), getScaledInt(30))));
 		txtMessage.setEditable(false);
 
-		setBackground(ColorResource.getDarkerBgColor());
+		setBackground(ColorResource.getPanelBackground());
 		setBounds(0, 0, getScaledInt(350), getScaledInt(210));
 
 		lblTitle.setBounds(getScaledInt(25), getScaledInt(15), getScaledInt(300), getScaledInt(30));
@@ -155,11 +155,11 @@ public class MessageBox extends JPanel implements ActionListener {
 		chkOption.setBounds(getScaledInt(15), getScaledInt(130), getScaledInt(320), getScaledInt(30));
 		chkOption.setOpaque(false);
 		chkOption.setFocusPainted(false);
-		chkOption.setForeground(Color.WHITE);
+		chkOption.setForeground(ColorResource.getDeepFontColor());
 
 		panel2 = new JPanel(null);
 		panel2.setBounds(0, getScaledInt(160), getScaledInt(350), getScaledInt(50));
-		panel2.setBackground(ColorResource.getDarkBgColor());
+		panel2.setBackground(ColorResource.getPanelBackground());
 
 		panel3 = new JPanel(null);
 		panel3.setBounds(0, getScaledInt(160), getScaledInt(350), getScaledInt(50));
@@ -237,10 +237,9 @@ public class MessageBox extends JPanel implements ActionListener {
 	void applyStyle(JButton btn) {
 		btn.addActionListener(this);
 		btn.setBackground(ColorResource.getDarkerBgColor());// );
-		btn.setForeground(Color.WHITE);
+		btn.setForeground(ColorResource.getDeepFontColor());
 		btn.setFocusable(true);
-		// btn.setForeground(Color.WHITE);
-		btn.setFont(FontResource.getBigFont());
+		// 		btn.setFont(FontResource.getBigFont());
 		btn.setBorderPainted(false);
 		btn.setMargin(new Insets(0, 0, 0, 0));
 		// btn.setFocusPainted(false);

@@ -137,7 +137,7 @@ public class F4MManifest {
 		baseUrl = xpath.evaluate("/ns:manifest/ns:baseURL", doc);
 		if (StringUtils.isNullOrEmptyOrBlank(baseUrl)) {
 			try {
-				URL url = new URL(surl);
+				URL url = java.net.URI.create(surl).toURL();
 				StringBuilder sb = new StringBuilder();
 				sb.append(url.getProtocol());
 				sb.append("://");

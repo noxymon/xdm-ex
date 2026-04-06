@@ -227,19 +227,7 @@ public class MonitoringSession implements Runnable {
 		res.setBody(b);
 	}
 
-	private void appendArray(String[] arr, StringBuffer buf) {
-		boolean insertComma = false;
-		if (arr != null && arr.length > 0) {
-			for (int i = 0; i < arr.length; i++) {
-				if (insertComma) {
-					buf.append(",");
-				} else {
-					insertComma = true;
-				}
-				buf.append("\"" + arr[i] + "\"");
-			}
-		}
-	}
+
 
 	// private void onFF(Request request, Response res) {
 	// ByteArrayOutputStream bout=new ByteArrayOutputStream();

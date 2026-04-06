@@ -18,7 +18,9 @@ public class LayeredPanel extends JPanel {
 		if (Config.getInstance().isNoTransparency()) {
 			opacity = 255;
 		}
-		bgColor = new Color(0, 0, 0, opacity);
+		Color bg = UIManager.getColor("Panel.background");
+		if (bg == null) bg = Color.DARK_GRAY;
+		bgColor = new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), opacity);
 		setOpaque(false);
 		setLayout(null);
 

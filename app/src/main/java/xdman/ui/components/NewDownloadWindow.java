@@ -2,9 +2,6 @@ package xdman.ui.components;
 
 import static xdman.util.XDMUtils.getScaledInt;
 
-import java.awt.Color;
-import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
@@ -64,12 +60,12 @@ public class NewDownloadWindow extends JDialog implements ActionListener, Docume
 			txtURL.setText(this.metadata.getUrl());
 			txtURL.setCaretPosition(0);
 		} else {
-			try {
-				URL url = new URI(XDMUtils.getClipBoardText()).toURL();
-				txtURL.setText(url.toString());
-				txtURL.setCaretPosition(0);
-			} catch (Exception e) {
-				Logger.log(e);
+			String clip = XDMUtils.getClipBoardText();
+			if (clip != null && clip.trim().length() > 0) {
+				if (XDMUtils.validateURL(clip)) {
+					txtURL.setText(clip);
+					txtURL.setCaretPosition(0);
+				}
 			}
 		}
 		if (!StringUtils.isNullOrEmptyOrBlank(fileName)) {
@@ -125,20 +121,19 @@ public class NewDownloadWindow extends JDialog implements ActionListener, Docume
 					return;
 				}
 
-				try {
-					URL url = new URI(urlStr).toURL();
-					String host = url.getHost().trim();
-					if (StringUtils.isNullOrEmptyOrBlank(host)) {
-						return;
+				if (XDMUtils.validateURL(urlStr)) {
+					try {
+						URL url = new URI(urlStr).toURL();
+						String host = url.getHost().trim();
+						if (StringUtils.isNullOrEmptyOrBlank(host)) {
+							return;
+						}
+						Config.getInstance().addBlockedHosts(host);
+						Config.getInstance().save();
+						dispose();
+					} catch (Exception e2) {
+						Logger.log(e2);
 					}
-					Config.getInstance().addBlockedHosts(host);
-					Config.getInstance().save();
-					dispose();
-					System.out.println("called");
-
-				} catch (Exception e2) {
-					e2.printStackTrace();
-					return;
 				}
 			}
 
@@ -221,157 +216,120 @@ public class NewDownloadWindow extends JDialog implements ActionListener, Docume
 	private void initUI() {
 		setUndecorated(true);
 
-		try {
-			if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-					.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT)) {
-				if (!Config.getInstance().isNoTransparency()) {
-					setOpacity(0.85f);
-				}
-			}
-		} catch (Exception e) {
-			Logger.log(e);
-		}
-
 		setIconImage(ImageResource.getImage("icon.png"));
 		setSize(getScaledInt(400), getScaledInt(210));
 		setLocationRelativeTo(null);
 		setAlwaysOnTop(true);
-		getContentPane().setLayout(null);
-		getContentPane().setBackground(ColorResource.getDarkestBgColor());
+		getContentPane().setLayout(new java.awt.BorderLayout());
 
 		JPanel titlePanel = new TitlePanel(null, this);
 		titlePanel.setOpaque(false);
-		titlePanel.setBounds(0, 0, getScaledInt(400), getScaledInt(50));
+		titlePanel.setPreferredSize(new java.awt.Dimension(getScaledInt(400), getScaledInt(50)));
+		titlePanel.setLayout(null);
 
 		JButton closeBtn = new CustomButton();
-		closeBtn.setBounds(getScaledInt(365), getScaledInt(5), getScaledInt(30), getScaledInt(30));
-		closeBtn.setBackground(ColorResource.getDarkestBgColor());
+		closeBtn.setBounds(getScaledInt(365), getScaledInt(10), getScaledInt(25), getScaledInt(25));
 		closeBtn.setBorderPainted(false);
 		closeBtn.setFocusPainted(false);
 		closeBtn.setName("CLOSE");
-
-		closeBtn.setIcon(ImageResource.getIcon("title_close.png",20,20));
+		closeBtn.setIcon(ImageResource.getIcon("title_close.png", 16, 16));
 		closeBtn.addActionListener(this);
 		titlePanel.add(closeBtn);
 
 		JLabel titleLbl = new JLabel(StringResource.get("ND_TITLE"));
 		titleLbl.setFont(FontResource.getBiggerFont());
-		titleLbl.setForeground(ColorResource.getSelectionColor());
-		titleLbl.setBounds(getScaledInt(25), getScaledInt(15), getScaledInt(200), getScaledInt(30));
+		titleLbl.setForeground(ColorResource.getDeepFontColor());
+		titleLbl.setBounds(getScaledInt(20), getScaledInt(10), getScaledInt(200), getScaledInt(30));
 		titlePanel.add(titleLbl);
 
-		JLabel lineLbl = new JLabel();
-		lineLbl.setBackground(ColorResource.getSelectionColor());
-		lineLbl.setBounds(0, getScaledInt(55), getScaledInt(400), 1);
-		lineLbl.setOpaque(true);
-		add(lineLbl);
+		add(titlePanel, java.awt.BorderLayout.NORTH);
 
-		txtURL = new JTextField();
-		// PopupAdapter.registerTxtPopup(txtURL);
-		txtURL.getDocument().addDocumentListener(this);
-		txtURL.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
-		txtURL.setBackground(ColorResource.getDarkestBgColor());
-		txtURL.setForeground(Color.WHITE);
-		txtURL.setBounds(getScaledInt(77), getScaledInt(79), getScaledInt(291), getScaledInt(20));
-		txtURL.setCaretColor(ColorResource.getSelectionColor());
-
-		add(txtURL);
-
-		filePane = new XDMFileSelectionPanel();
-		filePane.setBounds(getScaledInt(77), getScaledInt(111), getScaledInt(291), getScaledInt(20));
-		add(filePane);
-		// // PopupAdapter.registerTxtPopup(txtFile);
-		// txtFile.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
-		// txtFile.setBackground(ColorResource.getDarkestBgColor());
-		// txtFile.setForeground(Color.WHITE);
-		// txtFile.setBounds(getScaledInt(77), getScaledInt(111), getScaledInt(241),
-		// getScaledInt(20));
-		// txtFile.setCaretColor(ColorResource.getSelectionColor());
-		//
-		// add(txtFile);
-		//
-		// JButton browse = new CustomButton("...");
-		// browse.setName("BROWSE_FOLDER");
-		// browse.setMargin(new Insets(0, 0, 0, 0));
-		// browse.setBounds(getScaledInt(325), getScaledInt(111), getScaledInt(40),
-		// getScaledInt(20));
-		// browse.setFocusPainted(false);
-		// browse.setBackground(ColorResource.getDarkestBgColor());
-		// browse.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
-		// browse.setForeground(Color.WHITE);
-		// browse.addActionListener(this);
-		// browse.setFont(FontResource.getItemFont());
-		// add(browse);
-
-		add(titlePanel);
+		JPanel centerPanel = new JPanel(new java.awt.GridBagLayout());
+		centerPanel.setBackground(ColorResource.getDarkestBgColor());
+		centerPanel.setBorder(new EmptyBorder(getScaledInt(10), getScaledInt(20), getScaledInt(10), getScaledInt(20)));
+		java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+		gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(5, 5, 5, 5);
 
 		JLabel lblURL = new JLabel(StringResource.get("ND_ADDRESS"), JLabel.RIGHT);
 		lblURL.setFont(FontResource.getNormalFont());
-		lblURL.setForeground(Color.WHITE);
-		lblURL.setBounds(getScaledInt(10), getScaledInt(78), getScaledInt(61), getScaledInt(23));
-		add(lblURL);
+		lblURL.setForeground(ColorResource.getDeepFontColor());
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 0;
+		centerPanel.add(lblURL, gbc);
+
+		txtURL = new JTextField();
+		txtURL.getDocument().addDocumentListener(this);
+		txtURL.setCaretColor(ColorResource.getDeepFontColor());
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		centerPanel.add(txtURL, gbc);
 
 		JLabel lblFile = new JLabel(StringResource.get("ND_FILE"), JLabel.RIGHT);
 		lblFile.setFont(FontResource.getNormalFont());
-		lblFile.setForeground(Color.WHITE);
-		lblFile.setBounds(getScaledInt(10), getScaledInt(108), getScaledInt(61), getScaledInt(23));
-		add(lblFile);
+		lblFile.setForeground(ColorResource.getDeepFontColor());
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weightx = 0;
+		centerPanel.add(lblFile, gbc);
 
-		JPanel panel = new JPanel(null);
-		panel.setBounds(getScaledInt(1), getScaledInt(155), getScaledInt(400), getScaledInt(55));
-		panel.setBackground(Color.DARK_GRAY);
-		add(panel);
+		filePane = new XDMFileSelectionPanel();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.weightx = 1.0;
+		centerPanel.add(filePane, gbc);
+
+		add(centerPanel, java.awt.BorderLayout.CENTER);
+
+		JPanel bottomPanel = new JPanel(new java.awt.GridLayout(1, 3));
+		bottomPanel.setBackground(ColorResource.getDarkerBgColor());
+		bottomPanel.setPreferredSize(new java.awt.Dimension(getScaledInt(400), getScaledInt(50)));
 
 		btnMore = new CustomButton(StringResource.get("ND_MORE"));
 		btnDN = new CustomButton(StringResource.get("ND_DOWNLOAD_NOW"));
 		btnCN = new CustomButton(StringResource.get("ND_CANCEL"));
 
-		btnMore.setBounds(getScaledInt(0), getScaledInt(1), getScaledInt(120), getScaledInt(55));
 		btnMore.setName("BTN_MORE");
 		styleButton(btnMore);
-		panel.add(btnMore);
+		bottomPanel.add(btnMore);
 
-		btnDN.setBounds(getScaledInt(121), getScaledInt(1), getScaledInt(160), getScaledInt(55));
 		btnDN.setName("DOWNLOAD_NOW");
 		styleButton(btnDN);
-		panel.add(btnDN);
+		bottomPanel.add(btnDN);
 
-		btnCN.setBounds(getScaledInt(282), getScaledInt(1), getScaledInt(120), getScaledInt(55));
 		btnCN.setName("CLOSE");
 		styleButton(btnCN);
-		panel.add(btnCN);
+		bottomPanel.add(btnCN);
+
+		add(bottomPanel, java.awt.BorderLayout.SOUTH);
 	}
 
 	private void createPopup() {
 		pop = new JPopupMenu();
-		pop.setBackground(ColorResource.getDarkerBgColor());
 		JMenu dl = new JMenu(StringResource.get("ND_DOWNLOAD_LATER"));
-		dl.setForeground(Color.WHITE);
 		dl.setBorder(new EmptyBorder(getScaledInt(5), getScaledInt(5), getScaledInt(5), getScaledInt(5)));
 		dl.addActionListener(this);
-		dl.setBackground(ColorResource.getDarkerBgColor());
-		dl.setBorderPainted(false);
-		// dl.setBackground(C);
 		pop.add(dl);
 
 		createQueueItems(dl);
 
 		JMenuItem ig = new JMenuItem(StringResource.get("ND_IGNORE_URL"));
 		ig.setName("IGNORE_URL");
-		ig.setForeground(Color.WHITE);
 		ig.addActionListener(this);
 		pop.add(ig);
 		pop.setInvoker(btnMore);
 	}
 
 	private void styleButton(CustomButton btn) {
-		btn.setBackground(ColorResource.getDarkestBgColor());
-		btn.setPressedBackground(ColorResource.getDarkerBgColor());
-		btn.setForeground(Color.WHITE);
 		btn.setFont(FontResource.getBigFont());
 		btn.setBorderPainted(false);
 		btn.setMargin(new Insets(0, 0, 0, 0));
 		btn.setFocusPainted(false);
+		btn.setBackground(ColorResource.getDarkestBgColor());
+		btn.setForeground(ColorResource.getDeepFontColor());
+		btn.setPressedBackground(ColorResource.getDarkerBgColor());
 		btn.addActionListener(this);
 	}
 
@@ -381,7 +339,6 @@ public class NewDownloadWindow extends JDialog implements ActionListener, Docume
 			DownloadQueue q = queues.get(i);
 			JMenuItem mItem = new JMenuItem(q.getName().length() < 1 ? "Default queue" : q.getName());
 			mItem.setName("QUEUE:" + q.getQueueId());
-			mItem.setForeground(Color.WHITE);
 			mItem.addActionListener(this);
 			queueMenuItem.add(mItem);
 		}

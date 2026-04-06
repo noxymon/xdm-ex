@@ -2,10 +2,7 @@ package xdman.ui.components;
 
 import static xdman.util.XDMUtils.getScaledInt;
 
-import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.GraphicsDevice.WindowTranslucency;
-import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
 import java.awt.Taskbar;
 import java.awt.Taskbar.Feature;
@@ -24,7 +21,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import xdman.Config;
 import xdman.DownloadEntry;
 import xdman.DownloadWindowListener;
 import xdman.XDMApp;
@@ -36,7 +32,6 @@ import xdman.ui.res.FontResource;
 import xdman.ui.res.ImageResource;
 import xdman.ui.res.StringResource;
 import xdman.util.FormatUtilities;
-import xdman.util.Logger;
 
 public class DownloadWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -5523541940635914890L;
@@ -97,13 +92,6 @@ public class DownloadWindow extends JFrame implements ActionListener {
 			statTxt = StringResource.get("STAT_DOWNLOADING");
 		}
 		lblStat.setText(statTxt);
-		// StringBuilder sb = new StringBuilder();
-		// sb.append((d.isAssembling() ? StringResource.get("STAT_ASSEMBLING")
-		// : StringResource.get("DWN_DOWNLOAD")));
-		// sb.append(" ");
-		// sb.append(FormatUtilities.formatSize(d.getDownloaded()));
-		// sb.append(" ");
-		// sb.append(d.getType()==XDMConstants.HTTP?)
 
 		lblDet.setText((d.isAssembling() ? StringResource.get("STAT_ASSEMBLING") : StringResource.get("DWN_DOWNLOAD"))
 				+ " " + FormatUtilities.formatSize(d.getDownloaded()) + " "
@@ -150,7 +138,7 @@ public class DownloadWindow extends JFrame implements ActionListener {
 		txtError.setWrapStyleWord(true);
 		txtError.setLineWrap(true);
 		txtError.setBackground(ColorResource.getDarkestBgColor());
-		txtError.setForeground(Color.WHITE);
+		txtError.setForeground(ColorResource.getDeepFontColor());
 
 		JScrollPane jsp = new JScrollPane(txtError);
 		jsp.setBounds(getScaledInt(25), getScaledInt(20), getScaledInt(300), getScaledInt(100));
@@ -164,7 +152,7 @@ public class DownloadWindow extends JFrame implements ActionListener {
 
 		JPanel panel2 = new JPanel(null);
 		panel2.setBounds(0, getScaledInt(140), getScaledInt(350), getScaledInt(50));
-		panel2.setBackground(Color.DARK_GRAY);
+		panel2.setBackground(ColorResource.getDarkerBgColor());
 		panel2.add(exitBtn);
 
 		p2.add(jsp);
@@ -180,16 +168,6 @@ public class DownloadWindow extends JFrame implements ActionListener {
 
 	private void init() {
 		setUndecorated(true);
-		try {
-			if (GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-					.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT)) {
-				if (!Config.getInstance().isNoTransparency()) {
-					setOpacity(0.85f);
-				}
-			}
-		} catch (Exception e) {
-			Logger.log(e);
-		}
 
 		setTitle("Downloading...");
 		setIconImage(ImageResource.getImage("icon.png"));
@@ -215,7 +193,7 @@ public class DownloadWindow extends JFrame implements ActionListener {
 
 		minBtn = new CustomButton();
 		minBtn.setBounds(getScaledInt(296), getScaledInt(5), getScaledInt(24), getScaledInt(24));
-		minBtn.setIcon(ImageResource.getIcon("title_min.png", 20, 20));// ImageResource.get("title_min.png"));
+		minBtn.setIcon(ImageResource.getIcon("title_min.png", 20, 20));
 		minBtn.setBackground(ColorResource.getDarkestBgColor());
 		minBtn.setBorderPainted(false);
 		minBtn.setFocusPainted(false);
@@ -224,11 +202,11 @@ public class DownloadWindow extends JFrame implements ActionListener {
 
 		titleLbl = new JLabel(StringResource.get("DWN_TITLE"));
 		titleLbl.setFont(FontResource.getBiggerFont());
-		titleLbl.setForeground(ColorResource.getSelectionColor());
+		titleLbl.setForeground(ColorResource.getDeepFontColor());
 		titleLbl.setBounds(getScaledInt(25), getScaledInt(15), getScaledInt(250), getScaledInt(30));
 
 		JLabel lineLbl = new JLabel();
-		lineLbl.setBackground(ColorResource.getSelectionColor());
+		lineLbl.setBackground(ColorResource.getBorderColor());
 		lineLbl.setBounds(0, getScaledInt(55), getScaledInt(400), 2);
 		lineLbl.setOpaque(true);
 
@@ -244,26 +222,26 @@ public class DownloadWindow extends JFrame implements ActionListener {
 		lblSpeed = new JLabel("---");
 		lblSpeed.setHorizontalAlignment(JLabel.CENTER);
 		lblSpeed.setBounds(getScaledInt(15), getScaledInt(160), getScaledInt(80), getScaledInt(25));
-		lblSpeed.setForeground(Color.WHITE);
+		lblSpeed.setForeground(ColorResource.getDeepFontColor());
 
 		lblStat = new JLabel(StringResource.get("DWN_TITLE"));
 		lblStat.setBounds(getScaledInt(120), getScaledInt(85), getScaledInt(200), getScaledInt(25));
-		lblStat.setForeground(Color.WHITE);
+		lblStat.setForeground(ColorResource.getDeepFontColor());
 
 		segProgress = new SegmentPanel();
 		segProgress.setBounds(getScaledInt(120), getScaledInt(115), getScaledInt(200), getScaledInt(5));
 
 		lblDet = new JLabel(StringResource.get("DWN_PLACEHOLDER"));
 		lblDet.setBounds(getScaledInt(120), getScaledInt(125), getScaledInt(200), getScaledInt(25));
-		lblDet.setForeground(Color.WHITE);
+		lblDet.setForeground(ColorResource.getDeepFontColor());
 
 		lblETA = new JLabel("---");
 		lblETA.setBounds(getScaledInt(120), getScaledInt(150), getScaledInt(200), getScaledInt(25));
-		lblETA.setForeground(Color.WHITE);
+		lblETA.setForeground(ColorResource.getDeepFontColor());
 
 		panel = new JPanel(null);
 		panel.setBounds(0, getScaledInt(200), getScaledInt(350), getScaledInt(50));
-		panel.setBackground(Color.DARK_GRAY);
+		panel.setBackground(ColorResource.getDarkerBgColor());
 
 		btnMore = new CustomButton(StringResource.get("ND_MORE"));
 		CustomButton btnDN = new CustomButton(StringResource.get("DWN_PREVIEW"));
@@ -301,13 +279,13 @@ public class DownloadWindow extends JFrame implements ActionListener {
 
 		JMenuItem hd = new JMenuItem(StringResource.get("DWN_HIDE"));
 		hd.setName("BACKGROUND");
-		hd.setForeground(Color.WHITE);
+		hd.setForeground(ColorResource.getDeepFontColor());
 		hd.addActionListener(this);
 		pop.add(hd);
 
 		JMenuItem sv = new JMenuItem(StringResource.get("CTX_SAVE_AS"));
 		sv.setName("SAVE_AS");
-		sv.setForeground(Color.WHITE);
+		sv.setForeground(ColorResource.getDeepFontColor());
 		sv.addActionListener(this);
 		pop.add(sv);
 
@@ -318,12 +296,11 @@ public class DownloadWindow extends JFrame implements ActionListener {
 	void applyStyle(CustomButton btn) {
 		btn.addActionListener(this);
 		btn.setBackground(ColorResource.getDarkestBgColor());
-		btn.setForeground(Color.WHITE);
+		btn.setForeground(ColorResource.getDeepFontColor());
 		btn.setPressedBackground(ColorResource.getDarkerBgColor());
 		btn.setFont(FontResource.getBigFont());
 		btn.setBorderPainted(false);
 		btn.setMargin(new Insets(0, 0, 0, 0));
-		btn.setFocusPainted(false);
 		btn.setFocusPainted(false);
 	}
 

@@ -1,18 +1,15 @@
 package xdman.ui.components;
 
 import java.awt.Color;
-
 import javax.swing.Icon;
 import javax.swing.JButton;
-
-import xdman.ui.res.ColorResource;
+import com.formdev.flatlaf.FlatClientProperties;
 
 public class CustomButton extends JButton {
 	private static final long serialVersionUID = 6378409011977437191L;
-	private Color rolloverBackground, rolloverForeground;
-	private Color pressedBackground, pressedForeground;
 
 	public CustomButton() {
+		super();
 		init();
 	}
 
@@ -27,67 +24,26 @@ public class CustomButton extends JButton {
 	}
 
 	private void init() {
-		rolloverBackground = ColorResource.getSelectionColor();
-		rolloverForeground = Color.WHITE;
-		pressedBackground = ColorResource.getDarkBgColor();
-		pressedForeground = Color.WHITE;
+		// Use FlatLaf default styling for Kinetic Flux theme
+		setBorderPainted(false);
+		setFocusPainted(false);
+		setContentAreaFilled(true);
+		
+		// Set default arc for rounded corners
+		putClientProperty(FlatClientProperties.STYLE, "arc: 8;");
 	}
 
-	@Override
-	public Color getForeground() {
-		if (model.isRollover()) {
-			return rolloverForeground;
-		} else if (model.isPressed()) {
-			return pressedForeground;
-		} else {
-			return super.getForeground();
-		}
+	public void setArc(int arc) {
+		putClientProperty(FlatClientProperties.STYLE, "arc: " + arc + ";");
 	}
 
-	@Override
-	public Color getBackground() {
-		if (model.isPressed()) {
-			return pressedBackground;
-		} else if (model.isRollover()) {
-			return rolloverBackground;
-		} else {
-			return super.getBackground();
-		}
+	public void setRolloverBackground(Color rolloverBackground) {
+		putClientProperty(FlatClientProperties.STYLE, 
+			(String)getClientProperty(FlatClientProperties.STYLE) + "; hoverBackground: #" + Integer.toHexString(rolloverBackground.getRGB()).substring(2));
 	}
 
-	public static final long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	public final Color getRolloverBackground() {
-		return rolloverBackground;
-	}
-
-	public final void setRolloverBackground(Color rolloverBackground) {
-		this.rolloverBackground = rolloverBackground;
-	}
-
-	public final Color getRolloverForeground() {
-		return rolloverForeground;
-	}
-
-	public final void setRolloverForeground(Color rolloverForeground) {
-		this.rolloverForeground = rolloverForeground;
-	}
-
-	public final Color getPressedBackground() {
-		return pressedBackground;
-	}
-
-	public final void setPressedBackground(Color pressedBackground) {
-		this.pressedBackground = pressedBackground;
-	}
-
-	public final Color getPressedForeground() {
-		return pressedForeground;
-	}
-
-	public final void setPressedForeground(Color pressedForeground) {
-		this.pressedForeground = pressedForeground;
+    // Keep setter-like methods for compatibility, but map them to FlatLaf style where possible
+	public void setPressedBackground(Color pressedBackground) {
+		// Handle via style if necessary, but FlatLaf's default is usually better
 	}
 }

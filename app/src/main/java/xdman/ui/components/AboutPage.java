@@ -2,7 +2,6 @@ package xdman.ui.components;
 
 import static xdman.util.XDMUtils.getScaledInt;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
@@ -10,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import xdman.XDMApp;
+import xdman.ui.res.ColorResource;
 import xdman.ui.res.FontResource;
 import xdman.ui.res.StringResource;
 
@@ -31,7 +31,7 @@ public class AboutPage extends Page {
 
 		JLabel lblTitle = new JLabel(StringResource.get("FULL_NAME"));
 		lblTitle.setFont(FontResource.getBiggerFont());
-		lblTitle.setForeground(Color.WHITE);
+		lblTitle.setForeground(ColorResource.getDeepFontColor());
 		lblTitle.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(30), h);
 		panel.add(lblTitle);
 
@@ -49,7 +49,7 @@ public class AboutPage extends Page {
 		lblDetails.setWrapStyleWord(true);
 		lblDetails.setLineWrap(true);
 		lblDetails.setEditable(false);
-		lblDetails.setForeground(Color.WHITE);
+		lblDetails.setForeground(ColorResource.getDeepFontColor());
 		lblDetails.setText(details);
 		lblDetails.setFont(FontResource.getBigFont());
 		lblDetails.setBounds(getScaledInt(15), y, getScaledInt(350) - getScaledInt(30), h);

@@ -3,12 +3,10 @@ package xdman.ui.components;
 import java.awt.AWTEvent;
 import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
@@ -28,15 +26,14 @@ import java.util.Arrays;
 
 import javax.swing.Box;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import xdman.ui.res.ColorResource;
@@ -86,7 +83,7 @@ public class XDMFrame extends JFrame implements ComponentListener {
 		panTitle.setOpaque(true);
 
 		panClient = new JPanel(new BorderLayout());
-		panClient.setBackground(Color.WHITE);
+		panClient.setBackground(UIManager.getColor("Panel.background"));
 		JPanel panContent = new JPanel(new BorderLayout());
 		panContent.add(panTitle, BorderLayout.NORTH);
 		panContent.add(panClient);
@@ -133,28 +130,28 @@ public class XDMFrame extends JFrame implements ComponentListener {
 		lblRightGrip = new JLabel();
 		lblRightGrip.setMaximumSize(new Dimension(2, lblRightGrip.getMaximumSize().height));
 		lblRightGrip.setPreferredSize(new Dimension(2, lblRightGrip.getPreferredSize().height));
-		lblRightGrip.setBackground(Color.BLACK);
+		lblRightGrip.setBackground(UIManager.getColor("Component.borderColor"));
 		lblRightGrip.setOpaque(true);
 		contentPane.add(lblRightGrip, BorderLayout.EAST);
 
 		lblBottomGrip = new JLabel();
 		lblBottomGrip.setMaximumSize(new Dimension(lblBottomGrip.getPreferredSize().width, 2));
 		lblBottomGrip.setPreferredSize(new Dimension(lblBottomGrip.getPreferredSize().width, 2));
-		lblBottomGrip.setBackground(Color.BLACK);
+		lblBottomGrip.setBackground(UIManager.getColor("Component.borderColor"));
 		lblBottomGrip.setOpaque(true);
 		contentPane.add(lblBottomGrip, BorderLayout.SOUTH);
 
 		lblLeftGrip = new JLabel();
 		lblLeftGrip.setMaximumSize(new Dimension(2, lblLeftGrip.getPreferredSize().height));
 		lblLeftGrip.setPreferredSize(new Dimension(2, lblLeftGrip.getPreferredSize().height));
-		lblLeftGrip.setBackground(Color.BLACK);
+		lblLeftGrip.setBackground(UIManager.getColor("Component.borderColor"));
 		lblLeftGrip.setOpaque(true);
 		contentPane.add(lblLeftGrip, BorderLayout.WEST);
 
 		lblTopGrip = new JLabel();
 		lblTopGrip.setMaximumSize(new Dimension(lblTopGrip.getPreferredSize().width, 2));
 		lblTopGrip.setPreferredSize(new Dimension(lblTopGrip.getPreferredSize().width, 2));
-		lblTopGrip.setBackground(Color.BLACK);
+		lblTopGrip.setBackground(UIManager.getColor("Component.borderColor"));
 		lblTopGrip.setOpaque(true);
 		contentPane.add(lblTopGrip, BorderLayout.NORTH);
 
@@ -218,7 +215,7 @@ public class XDMFrame extends JFrame implements ComponentListener {
 		vBox.setOpaque(true);
 		vBox.setBackground(ColorResource.getTitleColor());
 		Box hBox = Box.createHorizontalBox();
-		hBox.setBackground(ColorResource.getTitleColor());
+		hBox.setOpaque(false);
 
 		// if (menuBox) {
 		// // JButton btn2 =
@@ -420,12 +417,12 @@ public class XDMFrame extends JFrame implements ComponentListener {
 
 	JButton createTransparentButton(Icon icon, Dimension d, ActionListener actionListener) {
 		CustomButton btn = new CustomButton(icon);
-		btn.setBackground(ColorResource.getTitleColor());
 		btn.setBorderPainted(false);
 		btn.setContentAreaFilled(false);
 		btn.setFocusPainted(false);
 		btn.setPreferredSize(d);
 		btn.addActionListener(actionListener);
+		btn.setForeground(ColorResource.getDeepFontColor());
 		return btn;
 	}
 

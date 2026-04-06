@@ -1,36 +1,45 @@
 package xdman.ui.components;
 
 import java.awt.*;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import xdman.ui.res.ImageResource;
-
 public class BarPanel extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5396480713429517585L;
-	Image imgBar;
 
 	public BarPanel() {
 		super();
-		try {
-			imgBar = ImageIO.read(ImageResource.class.getResource("/icons/xxhdpi/bar.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
+		// Instead of a hardcoded image, we'll use a theme-aware background.
+		// FlatLaf automatically handles background colors based on the theme.
+		updateThemeColors();
+	}
+
+	private void updateThemeColors() {
+		// Using a slightly different color to maintain the 'bar' aesthetic if needed,
+		// but defaults are usually best for contrast.
+		setBackground(UIManager.getColor("Separator.background"));
+		if (getBackground() == null) {
+			setBackground(UIManager.getColor("Panel.background"));
 		}
-		this.setOpaque(false);
+	}
+
+	@Override
+	public void updateUI() {
+		super.updateUI();
+		updateThemeColors();
 	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
-		Graphics2D g2=(Graphics2D) g;
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		g2.drawImage(imgBar, 0, 0, this.getWidth(), this.getHeight(), this);// ,
-		super.paintComponent(g2);
+		// For modernization, we'll use a subtle gradient or solid color based on theme.
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g.create();
+		try {
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			// We can add a subtle bottom border for better separation
+			g2.setColor(UIManager.getColor("Component.borderColor"));
+			g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
+		} finally {
+			g2.dispose();
+		}
 	}
 }

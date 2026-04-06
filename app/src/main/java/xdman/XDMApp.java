@@ -9,8 +9,8 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.PasswordAuthentication;
-import java.nio.file.Paths;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -48,7 +48,6 @@ import xdman.ui.components.TrayHandler;
 import xdman.ui.components.VideoDownloadWindow;
 import xdman.ui.components.VideoPopup;
 import xdman.ui.components.VideoPopupItem;
-import xdman.ui.laf.XDMLookAndFeel;
 import xdman.ui.res.StringResource;
 import xdman.util.FFmpegDownloader;
 import xdman.util.LinuxUtils;
@@ -211,18 +210,33 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 
 	private XDMApp() {
 		Logger.log("Init app");
-//		String stype = paramMap.get("screen");
-//		if (stype != null) {
-//			if ("xxhdpi".equals(stype)) {
-//				XDMUtils.forceScreenType(XDMConstants.XHDPI);
-//			} else if ("xhdpi".equals(stype)) {
-//				XDMUtils.forceScreenType(XDMConstants.HDPI);
-//			} else if ("hdpi".equals(stype)) {
-//				XDMUtils.forceScreenType(XDMConstants.NORMAL);
-//			}
-//		}
+		// String stype = paramMap.get("screen");
+		// if (stype != null) {
+		// if ("xxhdpi".equals(stype)) {
+		// XDMUtils.forceScreenType(XDMConstants.XHDPI);
+		// } else if ("xhdpi".equals(stype)) {
+		// XDMUtils.forceScreenType(XDMConstants.HDPI);
+		// } else if ("hdpi".equals(stype)) {
 		try {
-			UIManager.setLookAndFeel(new XDMLookAndFeel());
+			// Initialize FlatLaf based on system theme
+			boolean isDark = xdman.util.XDMUtils.isSystemDark();
+			// Use the standard FlatLaf way if possible
+			try {
+				if (isDark) {
+					com.formdev.flatlaf.FlatDarkLaf.setup();
+				} else {
+					com.formdev.flatlaf.FlatLightLaf.setup();
+				}
+			} catch (Exception e) {
+				com.formdev.flatlaf.FlatDarkLaf.setup();
+			}
+
+			// Use the requested 2px arc (default)
+			UIManager.put("Button.arc", 2);
+			UIManager.put("Component.arc", 2);
+			UIManager.put("TextComponent.arc", 2);
+			UIManager.put("ProgressBar.arc", 2);
+
 		} catch (Exception e) {
 			Logger.log(e);
 		}
@@ -775,18 +789,18 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 
 	public String getFolder(int category) {
 		switch (category) {
-		case XDMConstants.DOCUMENTS:
-			return Config.getInstance().getCategoryDocuments();
-		case XDMConstants.MUSIC:
-			return Config.getInstance().getCategoryMusic();
-		case XDMConstants.VIDEO:
-			return Config.getInstance().getCategoryVideos();
-		case XDMConstants.PROGRAMS:
-			return Config.getInstance().getCategoryPrograms();
-		case XDMConstants.COMPRESSED:
-			return Config.getInstance().getCategoryCompressed();
-		default:
-			return Config.getInstance().getCategoryOther();
+			case XDMConstants.DOCUMENTS:
+				return Config.getInstance().getCategoryDocuments();
+			case XDMConstants.MUSIC:
+				return Config.getInstance().getCategoryMusic();
+			case XDMConstants.VIDEO:
+				return Config.getInstance().getCategoryVideos();
+			case XDMConstants.PROGRAMS:
+				return Config.getInstance().getCategoryPrograms();
+			case XDMConstants.COMPRESSED:
+				return Config.getInstance().getCategoryCompressed();
+			default:
+				return Config.getInstance().getCategoryOther();
 		}
 	}
 
