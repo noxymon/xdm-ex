@@ -57,16 +57,16 @@ public class XDMFrame extends JFrame implements ComponentListener {
 
 	private Component lastFocusOwner;
 
-	protected boolean showTwitterIcon = true, showFBIcon = true, showGitHubIcon;
+	protected boolean showTwitterIcon = false, showFBIcon = false, showGitHubIcon;
 
 	protected String twitterUrl, fbUrl, gitHubUrl;
 
 	public XDMFrame() {
 		setUndecorated(true);
-//		getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-//		setDefaultLookAndFeelDecorated(true);
+		// getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+		// setDefaultLookAndFeelDecorated(true);
 
-//		
+		//
 
 		createCursors();
 		contentPane = new JPanel(new BorderLayout());
@@ -79,7 +79,7 @@ public class XDMFrame extends JFrame implements ComponentListener {
 		panTitle = new TitlePanel(new BorderLayout(), this);
 		panTitle.setBackground(ColorResource.getTitleColor());
 		panTitle.setBorder(new EmptyBorder(XDMUtils.getScaledInt(5), XDMUtils.getScaledInt(5), XDMUtils.getScaledInt(0),
-				XDMUtils.getScaledInt(5)));
+				XDMUtils.getScaledInt(0)));
 		panTitle.setOpaque(true);
 
 		panClient = new JPanel(new BorderLayout());
@@ -308,9 +308,9 @@ public class XDMFrame extends JFrame implements ComponentListener {
 
 				winDim = getBounds();
 
-//				GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//				Rectangle bounds = env.getMaximumWindowBounds();
-//				setBounds(bounds);
+				// GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+				// Rectangle bounds = env.getMaximumWindowBounds();
+				// setBounds(bounds);
 
 				Rectangle r1 = getGraphicsConfiguration().getBounds();
 				Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
@@ -321,33 +321,39 @@ public class XDMFrame extends JFrame implements ComponentListener {
 
 				setBounds(r1);
 
-//				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//				Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
-//				Rectangle r = new Rectangle(0, 0, screenSize.width - scnMax.right - scnMax.left,
-//						screenSize.height - scnMax.bottom - scnMax.top);
-//				setSize(r.width, r.height);
-//				setLocation(r.x, r.y);
+				// Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+				// Insets scnMax =
+				// Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+				// Rectangle r = new Rectangle(0, 0, screenSize.width - scnMax.right -
+				// scnMax.left,
+				// screenSize.height - scnMax.bottom - scnMax.top);
+				// setSize(r.width, r.height);
+				// setLocation(r.x, r.y);
 				maximized = true;
 			}
 
 			System.out.println("Dpi scale: " + DpiUtils.getWindowScale(XDMFrame.this));
 
 			// XDMFrame.this.setMaximizedBounds(null);
-//			new (0 + scnMax.left, 0 + scnMax.top,
-//					screenSize.width - scnMax.right, screenSize.height - scnMax.bottom));
+			// new (0 + scnMax.left, 0 + scnMax.top,
+			// screenSize.width - scnMax.right, screenSize.height - scnMax.bottom));
 
-//			Rectangle r = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-//
-//			System.out.println(r + " -- " + getGraphicsConfiguration().getBounds() + " -- "
-//					+ GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds() + " -- "
-//					+ GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-//							.getDefaultConfiguration().getBounds());
-//
-//			XDMFrame.this
-//					.setMaximizedBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-//			XDMFrame.this.setExtendedState(
-//					(XDMFrame.this.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH ? JFrame.NORMAL
-//							: JFrame.MAXIMIZED_BOTH);
+			// Rectangle r =
+			// GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+			//
+			// System.out.println(r + " -- " + getGraphicsConfiguration().getBounds() + " --
+			// "
+			// + GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds()
+			// + " -- "
+			// + GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+			// .getDefaultConfiguration().getBounds());
+			//
+			// XDMFrame.this
+			// .setMaximizedBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+			// XDMFrame.this.setExtendedState(
+			// (XDMFrame.this.getExtendedState() & JFrame.MAXIMIZED_BOTH) ==
+			// JFrame.MAXIMIZED_BOTH ? JFrame.NORMAL
+			// : JFrame.MAXIMIZED_BOTH);
 		};
 	};
 
@@ -426,11 +432,11 @@ public class XDMFrame extends JFrame implements ComponentListener {
 		return btn;
 	}
 
-//	protected void setMenuActionListener(ActionListener a) {
-//		if (menuBtn != null) {
-//			menuBtn.addActionListener(a);
-//		}
-//	}
+	// protected void setMenuActionListener(ActionListener a) {
+	// if (menuBtn != null) {
+	// menuBtn.addActionListener(a);
+	// }
+	// }
 
 	@Override
 	public void componentHidden(ComponentEvent c) {

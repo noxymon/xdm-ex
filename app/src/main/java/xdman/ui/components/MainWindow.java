@@ -77,13 +77,15 @@ import xdman.util.XDMUtils;
 public class MainWindow extends XDMFrame implements ActionListener {
 	private static final long serialVersionUID = -3119522563540700138L;
 
-	CustomButton btnTabArr[];
-	CustomButton btnSort;
-	CustomButton btnQueue;
+	javax.swing.ButtonGroup btnTabGroup;
+	javax.swing.JToggleButton btnTabArr[];
+	JButton btnSort;
+	JButton btnQueue;
 	JTextField txtSearch;
 	JMenuItem[] sortItems;
 	String[][] sortStatusText;
-	JLabel[] lblCatArr;
+	javax.swing.ButtonGroup btnCatGroup;
+	javax.swing.JToggleButton[] btnCatArr;
 	SidePanel sp;
 	DownloadListView lv;
 	JPopupMenu popupCtx;
@@ -249,22 +251,22 @@ public class MainWindow extends XDMFrame implements ActionListener {
 				filter();
 			} else if ("CAT_DOCUMENTS".equals(name)) {
 				config.setCategoryFilter(XDMConstants.DOCUMENTS);
-				updateSidePanel((JLabel) e.getSource());
+				updateSidePanel();
 			} else if ("CAT_COMPRESSED".equals(name)) {
 				config.setCategoryFilter(XDMConstants.COMPRESSED);
-				updateSidePanel((JLabel) e.getSource());
+				updateSidePanel();
 			} else if ("CAT_MUSIC".equals(name)) {
 				config.setCategoryFilter(XDMConstants.MUSIC);
-				updateSidePanel((JLabel) e.getSource());
+				updateSidePanel();
 			} else if ("CAT_PROGRAMS".equals(name)) {
 				config.setCategoryFilter(XDMConstants.PROGRAMS);
-				updateSidePanel((JLabel) e.getSource());
+				updateSidePanel();
 			} else if ("CAT_VIDEOS".equals(name)) {
 				config.setCategoryFilter(XDMConstants.VIDEO);
-				updateSidePanel((JLabel) e.getSource());
+				updateSidePanel();
 			} else if ("CAT_ALL".equals(name)) {
 				config.setCategoryFilter(XDMConstants.ALL);
-				updateSidePanel((JLabel) e.getSource());
+				updateSidePanel();
 			} else if ("MENU_CLIP_ADD".equals(name)) {
 				int ret = MessageBox.show(this, "sample title",
 						"sample textdgdfgdfgdfghdfh gfhsdgh gfgfh dfgdfqwewrqwerwerqwerqwerwerwqerqwerqwerqwerwerwegfterj jgh ker gwekl hwgklerhg ek hrkjlwhlk kj hgeklgh jkle herklj gheklwerjgh sample textdgdfgdfgdfghdfh gfhsdgh gfgfh dfgdfqwewrqwerwerqwerqwerwerwqerqwerqwerqwerwerwegfterj jgh ker gwekl hwgklerhg ek hrkjlwhlk kj hgeklgh jkle herklj gheklwerjgh",
@@ -362,18 +364,7 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		}
 	}
 
-	private void updateSidePanel(JLabel lbl) {
-		for (int i = 0; i < lblCatArr.length; i++) {
-			if (lbl == lblCatArr[i]) {
-				lblCatArr[i].setBackground(ColorResource.getSelectionColor());
-				lblCatArr[i].setForeground(ColorResource.getSelectionForeground());
-				lblCatArr[i].setOpaque(true);
-			} else {
-				lblCatArr[i].setBackground(null);
-				lblCatArr[i].setForeground(ColorResource.getDeepFontColor());
-				lblCatArr[i].setOpaque(false);
-			}
-		}
+	private void updateSidePanel() {
 		lv.refresh();
 		sp.repaint();
 	}
@@ -469,30 +460,30 @@ public class MainWindow extends XDMFrame implements ActionListener {
 
 	private SidePanel createSidePanel() {
 		sp = new SidePanel();
-		sp.setLayout(null);
+		sp.setLayout(new javax.swing.BoxLayout(sp, javax.swing.BoxLayout.Y_AXIS));
+		sp.setBorder(new EmptyBorder(scale(20), scale(5), 0, scale(5)));
 		sp.setPreferredSize(new Dimension(scale(150), scale(250)));
 
-		lblCatArr = new JLabel[6];
+		btnCatGroup = new javax.swing.ButtonGroup();
+		btnCatArr = new javax.swing.JToggleButton[6];
 
-		lblCatArr[0] = createCategoryLabel("CAT_ALL");
-		lblCatArr[1] = createCategoryLabel("CAT_DOCUMENTS");
-		lblCatArr[2] = createCategoryLabel("CAT_COMPRESSED");
-		lblCatArr[3] = createCategoryLabel("CAT_MUSIC");
-		lblCatArr[4] = createCategoryLabel("CAT_VIDEOS");
-		lblCatArr[5] = createCategoryLabel("CAT_PROGRAMS");
+		btnCatArr[0] = createCategoryButton("CAT_ALL", "folder.png");
+		btnCatArr[1] = createCategoryButton("CAT_DOCUMENTS", "document.png");
+		btnCatArr[2] = createCategoryButton("CAT_COMPRESSED", "compressed.png");
+		btnCatArr[3] = createCategoryButton("CAT_MUSIC", "music.png");
+		btnCatArr[4] = createCategoryButton("CAT_VIDEOS", "video.png");
+		btnCatArr[5] = createCategoryButton("CAT_PROGRAMS", "program.png");
 
-		lblCatArr[0].setBackground(ColorResource.getActiveTabColor());
-		lblCatArr[0].setOpaque(true);
+		btnCatArr[0].setSelected(true);
 
 		for (int i = 0; i < 6; i++) {
-			lblCatArr[i].setBounds(0, scale(20 + (i * 35)), scale(149), scale(27));
 			final int c = i;
-			lblCatArr[i].addMouseListener(new MouseAdapter() {
-				public void mouseReleased(MouseEvent e) {
-					actionPerformed(new ActionEvent(lblCatArr[c], 0, ""));
-				}
+			btnCatArr[i].addActionListener(e -> {
+				actionPerformed(new ActionEvent(btnCatArr[c], 0, ""));
 			});
-			sp.add(lblCatArr[i]);
+			btnCatGroup.add(btnCatArr[i]);
+			sp.add(btnCatArr[i]);
+			sp.add(Box.createRigidArea(new Dimension(0, scale(5))));
 		}
 		return sp;
 	}
@@ -604,10 +595,10 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		// getTitlePanel().add(panel);
 
 		Box menuBox = Box.createHorizontalBox();
-		menuBox.setBorder(new EmptyBorder(0, 0, getScaledInt(20), 0));
+		menuBox.setBorder(new javax.swing.border.EmptyBorder(0, 0, getScaledInt(20), getScaledInt(10)));
 		menuBox.add(Box.createHorizontalGlue());
 		menuBox.add(bar);
-		menuBox.add(Box.createHorizontalStrut(getScaledInt(30)));
+		menuBox.add(Box.createHorizontalStrut(getScaledInt(20)));
 		menuBox.add(super.createWindowButtons());
 		menuBox.setAlignmentX(Box.RIGHT_ALIGNMENT);
 		this.rightbox.add(menuBox);
@@ -642,26 +633,33 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		return menu;
 	}
 
-	private JLabel createCategoryLabel(String name) {
-		JLabel lblCat = new JLabel(StringResource.get(name));
-		lblCat.setName(name);
-		lblCat.setFont(FontResource.getBigFont());
-		lblCat.setBorder(new EmptyBorder(getScaledInt(5), getScaledInt(20), getScaledInt(5), getScaledInt(5)));
-		lblCat.setForeground(ColorResource.getDeepFontColor());
-		lblCat.putClientProperty(FlatClientProperties.STYLE,
-				"arc: 12;");
-		return lblCat;
+	private javax.swing.JToggleButton createCategoryButton(String name, String icon) {
+		javax.swing.JToggleButton btnCat = new javax.swing.JToggleButton(StringResource.get(name));
+		btnCat.setName(name);
+		btnCat.setFont(FontResource.getBigFont());
+		if (icon != null) {
+			btnCat.setIcon(ImageResource.getIcon(icon, 18, 18));
+		}
+		btnCat.setHorizontalAlignment(SwingConstants.LEFT);
+		btnCat.setBorder(new EmptyBorder(getScaledInt(5), getScaledInt(15), getScaledInt(5), getScaledInt(5)));
+		btnCat.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_BORDERLESS);
+		btnCat.putClientProperty(FlatClientProperties.STYLE,
+				"margin: 5, 15, 5, 5;" +
+						"iconTextGap: 10;");
+		btnCat.setMaximumSize(new Dimension(Integer.MAX_VALUE, scale(35)));
+		return btnCat;
 	}
 
-	private CustomButton createDropdownBtn(String textKey) {
-		CustomButton btn = new CustomButton(StringResource.get(textKey));
-		btn.setBackground(ColorResource.getActiveTabColor());
-		btn.setArc(12);
+	private JButton createDropdownBtn(String textKey) {
+		JButton btn = new JButton(StringResource.get(textKey));
 		btn.setIcon(ImageResource.getIcon("down.png", 10, 10));
 		btn.setVerticalTextPosition(SwingConstants.CENTER);
 		btn.setHorizontalTextPosition(SwingConstants.LEFT);
 		btn.setFont(FontResource.getNormalFont());
-		btn.setForeground(ColorResource.getDeepFontColor());
+		btn.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_BORDERLESS);
+		btn.putClientProperty(FlatClientProperties.STYLE,
+				"margin: 4, 10, 4, 10;" +
+						"iconTextGap: 6;");
 		return btn;
 	}
 
@@ -805,24 +803,15 @@ public class MainWindow extends XDMFrame implements ActionListener {
 	}
 
 	private void createTabs() {
-		CustomButton btnAllTab = new CustomButton(StringResource.get("ALL_DOWNLOADS")),
-				btnIncompleteTab = new CustomButton(StringResource.get("ALL_UNFINISHED")),
-				btnCompletedTab = new CustomButton(StringResource.get("ALL_FINISHED"));
+		btnTabGroup = new javax.swing.ButtonGroup();
+		btnTabArr = new javax.swing.JToggleButton[3];
 
-		btnTabArr = new CustomButton[3];
-		btnTabArr[0] = btnAllTab;
-		btnTabArr[0].setName("ALL_DOWNLOADS");
-		btnTabArr[1] = btnIncompleteTab;
-		btnTabArr[1].setName("ALL_UNFINISHED");
-		btnTabArr[2] = btnCompletedTab;
-		btnTabArr[2].setName("ALL_FINISHED");
+		btnTabArr[0] = createTabButton("ALL_DOWNLOADS");
+		btnTabArr[1] = createTabButton("ALL_UNFINISHED");
+		btnTabArr[2] = createTabButton("ALL_FINISHED");
 
-		for (int i = 0; i < 3; i++) {
-			btnTabArr[i].setFont(FontResource.getBigBoldFont());
-			btnTabArr[i].setBorderPainted(false);
-			btnTabArr[i].setFocusPainted(false);
-			btnTabArr[i].addActionListener(this);
-		}
+		// Pre-select "All" tab
+		btnTabArr[0].setSelected(true);
 
 		JPanel p = new JPanel(new GridLayout(1, 3, scale(5), 0));
 		p.setBorder(null);
@@ -831,17 +820,26 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		p.setPreferredSize(d);
 		p.setMaximumSize(d);
 		p.setMinimumSize(d);
-		p.add(btnAllTab);
-		p.add(btnIncompleteTab);
-		p.add(btnCompletedTab);
+
+		for (int i = 0; i < 3; i++) {
+			btnTabGroup.add(btnTabArr[i]);
+			p.add(btnTabArr[i]);
+		}
 
 		p.setAlignmentX(Box.RIGHT_ALIGNMENT);
-
 		this.rightbox.add(p);
+	}
 
-		// pp.add(p, BorderLayout.EAST);
-
-		// getTitlePanel().add(pp, BorderLayout.SOUTH);
+	private javax.swing.JToggleButton createTabButton(String name) {
+		javax.swing.JToggleButton btn = new javax.swing.JToggleButton(StringResource.get(name));
+		btn.setName(name);
+		btn.setFont(FontResource.getBigBoldFont());
+		btn.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TAB);
+		btn.putClientProperty(FlatClientProperties.STYLE,
+				"margin: 4, 12, 4, 12;" +
+						"focusWidth: 0;");
+		btn.addActionListener(this);
+		return btn;
 	}
 
 	private void tabClicked(ActionEvent e) {
@@ -861,9 +859,9 @@ public class MainWindow extends XDMFrame implements ActionListener {
 			Desktop.getDesktop().addAppEventListener((AppReopenedListener) e -> XDMApp.getInstance().showMainWindow());
 		}
 
-		showTwitterIcon = true;
-		showFBIcon = true;
-		showGitHubIcon = true;
+		showTwitterIcon = false;
+		showFBIcon = false;
+		showGitHubIcon = false;
 		fbUrl = XDMApp.APP_FACEBOOK_URL;
 		twitterUrl = XDMApp.APP_TWITTER_URL;
 		gitHubUrl = XDMApp.APP_HOME_URL;
@@ -875,7 +873,9 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		this.rightbox = Box.createVerticalBox();
 
 		createMainMenu();
-		rightbox.add(Box.createVerticalGlue());
+		Component glue = Box.createVerticalGlue();
+		((JComponent) glue).setAlignmentX(Box.RIGHT_ALIGNMENT);
+		rightbox.add(glue);
 		createTabs();
 		getTitlePanel().add(rightbox, BorderLayout.EAST);
 
