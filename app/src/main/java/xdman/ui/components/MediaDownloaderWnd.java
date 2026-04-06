@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,7 +92,7 @@ public class MediaDownloaderWnd extends JFrame implements ActionListener, Thumbn
 		initUI();
 		imageMap = new HashMap<>();
 		try {
-			URL url = new URL(XDMUtils.getClipBoardText());
+			URL url = new URI(XDMUtils.getClipBoardText()).toURL();
 			txtURL.setText(url.toString());
 			txtURL.setCaretPosition(0);
 		} catch (Exception e) {

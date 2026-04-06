@@ -1,6 +1,6 @@
 package xdman;
 
-import java.net.URL;
+import java.net.URI;
 
 import xdman.downloaders.metadata.HttpMetadata;
 import xdman.util.Logger;
@@ -60,7 +60,7 @@ public class ClipboardMonitor implements Runnable {
 					Logger.log("New content: " + txt);
 					lastContent = txt;
 					try {
-						new URL(txt);
+						new URI(txt).toURL();
 						HttpMetadata md = new HttpMetadata();
 						md.setUrl(txt);
 						String file = XDMUtils.getFileName(txt);

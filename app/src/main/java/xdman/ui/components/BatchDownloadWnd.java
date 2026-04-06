@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +69,7 @@ public class BatchDownloadWnd extends JFrame implements ActionListener {
 			for (int i = 0; i < arr.length; i++) {
 				String url = arr[i];
 				try {
-					new URL(url);
+					new URI(url).toURL();
 					urls.add(url);
 				} catch (Exception e) {
 

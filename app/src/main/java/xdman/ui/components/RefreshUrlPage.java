@@ -7,7 +7,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JButton;
@@ -165,7 +165,7 @@ public class RefreshUrlPage extends Page implements LinkRefreshCallback {
 			public void actionPerformed(ActionEvent e) {
 				if (!StringUtils.isNullOrEmptyOrBlank(txtUrl.getText())) {
 					try {
-						new URL(txtUrl.getText());
+						new URI(txtUrl.getText()).toURL();
 						if (md != null) {
 							md.setUrl(txtUrl.getText());
 							md.save();

@@ -73,7 +73,7 @@ public class MacUtils {
 
 	public static void keepAwakePing() {
 		try {
-			Runtime.getRuntime().exec("caffeinate -i -t 3");
+			Runtime.getRuntime().exec(new String[] { "caffeinate", "-i", "-t", "3" });
 		} catch (Exception e) {
 			Logger.log(e);
 		}

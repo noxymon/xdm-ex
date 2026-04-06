@@ -15,9 +15,10 @@ public class LinuxUtils {
 
 	public static void initShutdown() {
 		for (int i = 0; i < shutdownCmds.length; i++) {
-			String cmd = shutdownCmds[0];
+			String cmd = shutdownCmds[i];
 			try {
-				Process proc = Runtime.getRuntime().exec(cmd);
+				String[] cmdArray = cmd.split(" ");
+				Process proc = Runtime.getRuntime().exec(cmdArray);
 				int ret = proc.waitFor();
 				if (ret == 0)
 					break;
@@ -42,8 +43,8 @@ public class LinuxUtils {
 
 	public static void keepAwakePing() {
 		try {
-			Runtime.getRuntime().exec(
-					"dbus-send --print-reply --type=method_call --dest=org.freedesktop.ScreenSaver /ScreenSaver org.freedesktop.ScreenSaver.SimulateUserActivity");
+			String cmd = "dbus-send --print-reply --type=method_call --dest=org.freedesktop.ScreenSaver /ScreenSaver org.freedesktop.ScreenSaver.SimulateUserActivity";
+			Runtime.getRuntime().exec(cmd.split(" "));
 		} catch (Exception e) {
 			Logger.log(e);
 		}

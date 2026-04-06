@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.net.PasswordAuthentication;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -396,7 +396,7 @@ public class BatchPatternDialog extends JFrame implements ActionListener, Docume
 				if (chkUseAuth.isSelected()) {
 					String user = txtUser.getText();
 					String pass = txtPass.getText();
-					String host = new URL(txtUrl.getText()).getHost();
+					String host = new URI(txtUrl.getText()).getHost();
 					CredentialManager.getInstance().addCredentialForHost(host,
 							new PasswordAuthentication(user, pass.toCharArray()));
 				}
@@ -419,7 +419,7 @@ public class BatchPatternDialog extends JFrame implements ActionListener, Docume
 		this.txtFile2.setText("");
 		this.txtFileN.setText("");
 		try {
-			new URL(this.txtUrl.getText());
+			new URI(this.txtUrl.getText()).toURL();
 			this.urls.addAll(generateUrls());
 			if (this.urls.size() > 0) {
 				txtFile1.setText(this.urls.get(0));

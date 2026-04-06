@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -518,7 +519,7 @@ public class MonitoringSession implements Runnable {
 
 	private boolean processDashSegment(ParsedHookData data) {
 		try {
-			URL url = new URL(data.getUrl());
+			URL url = new URI(data.getUrl()).toURL();
 			String host = url.getHost();
 			if (!(host.contains("youtube.com") || host.contains("googlevideo.com"))) {
 				Logger.log("non yt host");

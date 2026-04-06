@@ -1,0 +1,19 @@
+# Weird UI in Arch/Manjaro linux (The UI is broken) (#207)
+
+[Weird UI in Arch/Manjaro linux (The UI is broken)](https://github.com/subhra74/xdm/issues/207#top)
+[duplicateThis issue or pull request already exists](https://github.com/subhra74/xdm/issues?q=state%3Aopen%20label%3A%22duplicate%22)
+
+[abedih](https://github.com/abedih)
+[on May 30, 2020](https://github.com/subhra74/xdm/issues/207#issue-627664258)
+Hi I updated the XDM to the latest version. but the UI became completely useless. I used both the AUR package and the stand alone package from here. I've attached the screenshot.. my system:
+OS: Linux Manjaro (updated to the latest version) DE: KDE Monitor resolution: 4k (HiDPI) java version: openjdk version "13.0.2" 2020-01-14
+https://user-images.githubusercontent.com/18257531/83321403-b37d8b00-a264-11ea-9805-8673cd11ecfa.pngLogs (when I run xdm from terminal): [ main ] loading... [ main ] 13.0.2 5.6.12-1-MANJARO [ main ] Loading config... [ main ] Creating folders [ main ] starting monitoring... [ main ] Init app [ main ] Loading fonts [ main ] java.lang.NullPointerException: Unexpected EOF at xdman.XDMApp.loadDownloadList(XDMApp.java:811) at xdman.XDMApp.loadDownloadList(XDMApp.java:795) at xdman.XDMApp.<init>(XDMApp.java:235) at xdman.XDMApp.getInstance(XDMApp.java:384) at xdman.monitoring.BrowserMonitor.getSync(BrowserMonitor.java:119) at xdman.monitoring.BrowserMonitor.updateSettingsAndStatus(BrowserMonitor.java:48) at xdman.monitoring.BrowserMonitor.startMonitoring(BrowserMonitor.java:37) at xdman.XDMApp.start(XDMApp.java:201) at xdman.Main.main(Main.java:25) en [ main ] Loading language en [ main ] Context initialized [ Thread-1 ] java.net.BindException: Address already in use at java.base/sun.nio.ch.Net.bind0(Native Method) at java.base/sun.nio.ch.Net.bind(Net.java:469) at java.base/sun.nio.ch.Net.bind(Net.java:458) at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:643) at java.base/java.net.ServerSocket.bind(ServerSocket.java:374) at java.base/java.net.ServerSocket.bind(ServerSocket.java:328) at xdman.monitoring.BrowserMonitor.run(BrowserMonitor.java:186) at java.base/java.lang.Thread.run(Thread.java:830) [ Thread-1 ] instance already runninng
+
+```
+[ main ] loading... [ main ] 13.0.2 5.6.12-1-MANJARO [ main ] Loading config... [ main ] Creating folders [ main ] starting monitoring... [ main ] Init app [ main ] Loading fonts [ main ] java.lang.NullPointerException: Unexpected EOF at xdman.XDMApp.loadDownloadList(XDMApp.java:811) at xdman.XDMApp.loadDownloadList(XDMApp.java:795) at xdman.XDMApp.<init>(XDMApp.java:235) at xdman.XDMApp.getInstance(XDMApp.java:384) at xdman.monitoring.BrowserMonitor.getSync(BrowserMonitor.java:119) at xdman.monitoring.BrowserMonitor.updateSettingsAndStatus(BrowserMonitor.java:48) at xdman.monitoring.BrowserMonitor.startMonitoring(BrowserMonitor.java:37) at xdman.XDMApp.start(XDMApp.java:201) at xdman.Main.main(Main.java:25) en [ main ] Loading language en [ main ] Context initialized [ Thread-1 ] java.net.BindException: Address already in use at java.base/sun.nio.ch.Net.bind0(Native Method) at java.base/sun.nio.ch.Net.bind(Net.java:469) at java.base/sun.nio.ch.Net.bind(Net.java:458) at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:643) at java.base/java.net.ServerSocket.bind(ServerSocket.java:374) at java.base/java.net.ServerSocket.bind(ServerSocket.java:328) at xdman.monitoring.BrowserMonitor.run(BrowserMonitor.java:186) at java.base/java.lang.Thread.run(Thread.java:830) [ Thread-1 ] instance already runninng
+```
+
+[duplicateThis issue or pull request already exists](https://github.com/subhra74/xdm/issues?q=state%3Aopen%20label%3A%22duplicate%22)
+
+- 
+            

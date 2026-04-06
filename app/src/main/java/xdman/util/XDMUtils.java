@@ -12,8 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -114,7 +114,7 @@ public class XDMUtils {
 			url = url.toLowerCase();
 			if (url.startsWith("http://") || url.startsWith("https://")
 					|| url.startsWith("ftp://")) {
-				new URL(url);
+				new URI(url).toURL();
 				return true;
 			}
 			return false;
@@ -310,7 +310,7 @@ public class XDMUtils {
 	public static boolean exec(String args) {
 		try {
 			Logger.log("Launching: " + args);
-			Runtime.getRuntime().exec(args);
+			new ProcessBuilder(args.split(" ")).start();
 		} catch (IOException e) {
 			Logger.log(e);
 			return false;

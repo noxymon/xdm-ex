@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -64,7 +65,7 @@ public class NewDownloadWindow extends JDialog implements ActionListener, Docume
 			txtURL.setCaretPosition(0);
 		} else {
 			try {
-				URL url = new URL(XDMUtils.getClipBoardText());
+				URL url = new URI(XDMUtils.getClipBoardText()).toURL();
 				txtURL.setText(url.toString());
 				txtURL.setCaretPosition(0);
 			} catch (Exception e) {
@@ -125,7 +126,7 @@ public class NewDownloadWindow extends JDialog implements ActionListener, Docume
 				}
 
 				try {
-					URL url = new URL(urlStr);
+					URL url = new URI(urlStr).toURL();
 					String host = url.getHost().trim();
 					if (StringUtils.isNullOrEmptyOrBlank(host)) {
 						return;

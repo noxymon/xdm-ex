@@ -13,7 +13,7 @@ public class ParsedURL {
 
 	public static ParsedURL parse(String urlString) {
 		try {
-			URL url = new URL(urlString);
+			URL url = new URI(urlString).toURL();
 			ParsedURL parsedURL = new ParsedURL();
 			parsedURL._url = urlString;
 			parsedURL.host = url.getHost();

@@ -23,7 +23,7 @@ public class JavaHttpClient extends HttpClient {
 	public void connect() throws IOException {
 		HttpContext.getInstance().init();
 		WebProxy webproxy = ProxyResolver.resolve(_url);
-		URL url = new URL(_url);
+		URL url = URI.create(_url).toURL();
 		this.realURL = url;
 		if (webproxy != null) {
 			Proxy proxy = new Proxy(webproxy.isSocks() ? Proxy.Type.SOCKS : Proxy.Type.HTTP,
