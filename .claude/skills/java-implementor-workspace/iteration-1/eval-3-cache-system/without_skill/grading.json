@@ -1,0 +1,91 @@
+{
+  "expectations": [
+    {
+      "text": "Cache is generic with type parameters <K, V> (Items 29-30)",
+      "passed": true,
+      "evidence": "Cache.java line 32: 'public class Cache<K, V>' with @param <K> and @param <V> type parameters used throughout for store (Map<K, V>), get/put/remove operations."
+    },
+    {
+      "text": "Eviction strategy is behind an interface, allowing new strategies without modifying Cache (OCP)",
+      "passed": false,
+      "evidence": "EvictionStrategy<K> interface exists and Cache depends on it. However, Cache.java contains 'instanceof TTLEvictionStrategy' checks on lines 66-67 and 221-222, hardcoding knowledge of a specific implementation. This violates OCP: if a new strategy needs similar special handling, Cache must be modified. The TTL expiration check and removeExpired() call are baked directly into Cache rather than being handled through the interface."
+    },
+    {
+      "text": "Separate strategy implementations for LRU, LFU, and TTL (SRP)",
+      "passed": true,
+      "evidence": "Three separate files each implementing EvictionStrategy<K>: LRUEvictionStrategy.java (LinkedHashSet-based access order tracking), LFUEvictionStrategy.java (frequency map with TreeMap buckets), TTLEvictionStrategy.java (LinkedHashMap with expiration timestamps)."
+    },
+    {
+      "text": "Uses a builder pattern for cache configuration (Item 2)",
+      "passed": true,
+      "evidence": "CacheConfig.java contains a static Builder<K> class with fluent methods: maxSize(), evictionStrategy(), evictionType(), ttlEviction(), and build(). Usage: CacheConfig.<String>builder().maxSize(3).evictionType(CacheConfig.EvictionType.LRU).build()"
+    },
+    {
+      "text": "CacheStats is an immutable value object (Item 17)",
+      "passed": false,
+      "evidence": "CacheStatistics is mutable. It has mutating methods: recordHit(), recordMiss(), recordEviction() which increment AtomicLong counters, and reset() which sets them all to zero. It is a mutable statistics tracker, not an immutable value object. An immutable approach would return a snapshot (e.g., a record with final hit/miss/eviction counts)."
+    },
+    {
+      "text": "Thread safety is achieved via ConcurrentHashMap or explicit synchronization (Items 78-81)",
+      "passed": true,
+      "evidence": "Cache.java uses ConcurrentHashMap for the store (line 48), ReentrantReadWriteLock for all operations (line 50), and CacheStatistics uses AtomicLong counters for thread-safe statistics tracking."
+    },
+    {
+      "text": "Cache interface is focused — no unrelated methods bundled in (ISP)",
+      "passed": true,
+      "evidence": "Cache's public API contains only cache-related methods: get(), put(), remove(), containsKey(), size(), clear(), getStatistics(), getMaxSize(). No unrelated methods are present. Note: Cache is a concrete class rather than an interface, but its API surface is focused and cohesive."
+    },
+    {
+      "text": "Returns Optional for get() operations rather than null (Item 55)",
+      "passed": true,
+      "evidence": "Cache.java line 60: 'public Optional<V> get(K key)' returns Optional.of(value) on hit and Optional.empty() on miss. The remove() method (line 135) also returns Optional<V>."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 2,
+    "total": 8,
+    "pass_rate": 0.75
+  },
+  "execution_metrics": {},
+  "timing": {
+    "total_duration_seconds": 137.1
+  },
+  "claims": [
+    {
+      "claim": "ReadWriteLock allows concurrent reads while ensuring exclusive writes",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Cache.java uses lock.readLock() for get, containsKey, size and lock.writeLock() for put, remove, clear — correct read/write lock usage."
+    },
+    {
+      "claim": "LFU eviction breaks ties by age (oldest first)",
+      "type": "factual",
+      "verified": true,
+      "evidence": "LFUEvictionStrategy uses LinkedHashSet in frequencyBuckets which preserves insertion order; iterator().next() returns the oldest entry in the lowest-frequency bucket."
+    },
+    {
+      "claim": "Lock downgrade from write to read in get() TTL path is correct",
+      "type": "quality",
+      "verified": false,
+      "evidence": "Lines 69-84 of Cache.java release the read lock, acquire write lock, then re-acquire read lock in the finally block. This is not a true lock downgrade (which requires holding write lock while acquiring read lock). There is a window between read unlock and write lock acquisition where another thread could modify state. The re-check on line 74 mitigates this but the pattern is fragile."
+    }
+  ],
+  "user_notes_summary": null,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "CacheStats is an immutable value object (Item 17)",
+        "reason": "The naming is ambiguous — the class is called CacheStatistics, not CacheStats. The expectation could be clearer about whether it refers to a stats snapshot object or the live statistics tracker. The Effective Java Item 17 expectation implies the stats object should be a value type (like a record), but many cache implementations use mutable counters internally. Consider specifying: 'Statistics are exposed as an immutable snapshot' vs 'Statistics tracker uses immutable internals.'"
+      },
+      {
+        "assertion": "Eviction strategy is behind an interface, allowing new strategies without modifying Cache (OCP)",
+        "reason": "This assertion could be strengthened by explicitly requiring 'no instanceof checks against strategy implementations in Cache'. The current output technically allows new strategies but the instanceof TTLEvictionStrategy pattern is a significant OCP violation that a weaker reading of the assertion might miss."
+      },
+      {
+        "reason": "No assertion checks whether the eviction strategies are individually thread-safe or whether they rely on the Cache's lock. The current implementations (LRU/LFU/TTL) use non-thread-safe collections (LinkedHashSet, HashMap, LinkedHashMap) and depend entirely on the Cache's ReadWriteLock — this coupling is worth an assertion."
+      }
+    ],
+    "overall": "Assertions cover the major design patterns well. The two main gaps are: (1) the OCP assertion should be more specific about what constitutes a violation, and (2) the immutability assertion conflates a live mutable tracker with an immutable value object."
+  }
+}

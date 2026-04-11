@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "notification-service",
+  "prompt": "Create a NotificationService in Java that can send notifications via email, SMS, and push notifications. Each channel has different configuration (SMTP settings for email, API keys for SMS, device tokens for push). The service should support sending to multiple channels at once and handle failures gracefully — if one channel fails, the others should still send. Also need a way to add new notification channels in the future without changing existing code.",
+  "assertions": [
+    "Uses an interface or abstract type for notification channels (OCP/DIP)",
+    "Each channel (email, SMS, push) is a separate class implementing the interface (SRP)",
+    "NotificationService accepts channels via constructor injection, not internal instantiation (DIP)",
+    "Failure in one channel does not prevent other channels from sending (graceful degradation)",
+    "Configuration objects are immutable or use a builder pattern (Effective Java Items 2/17)",
+    "No raw types in generic code — proper use of parameterized types (Item 26)",
+    "Returns a result object or collection rather than void/boolean to report per-channel status",
+    "Uses static factory methods or builders for object creation where appropriate (Items 1-2)"
+  ]
+}

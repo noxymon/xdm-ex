@@ -1,0 +1,89 @@
+{
+  "expectations": [
+    {
+      "text": "Uses an interface or abstract type for notification channels (OCP/DIP)",
+      "passed": true,
+      "evidence": "NotificationChannel.java defines a public interface with send(Notification) and channelName() methods. All three channel implementations (EmailNotificationChannel, SmsNotificationChannel, PushNotificationChannel) implement this interface. NotificationService depends only on the NotificationChannel interface, not concrete classes."
+    },
+    {
+      "text": "Each channel (email, SMS, push) is a separate class implementing the interface (SRP)",
+      "passed": true,
+      "evidence": "Three separate classes exist: EmailNotificationChannel implements NotificationChannel, SmsNotificationChannel implements NotificationChannel, PushNotificationChannel implements NotificationChannel. Each is in its own file and handles only its specific delivery mechanism with its own config object."
+    },
+    {
+      "text": "NotificationService accepts channels via constructor injection, not internal instantiation (DIP)",
+      "passed": true,
+      "evidence": "NotificationService has a private constructor that takes List<NotificationChannel>. Channels are provided externally via static factory methods: NotificationService.of(NotificationChannel... channels) and NotificationService.fromChannels(List<NotificationChannel>). No channel is ever instantiated inside NotificationService."
+    },
+    {
+      "text": "Failure in one channel does not prevent other channels from sending (graceful degradation)",
+      "passed": true,
+      "evidence": "In NotificationService.send(), each channel is called in a for loop with individual try/catch blocks (lines 103-109): 'try { channel.send(notification); succeeded.add(channel.channelName()); } catch (NotificationException e) { failures.add(...); }'. A caught exception adds to failures list but the loop continues to the next channel."
+    },
+    {
+      "text": "Configuration objects are immutable or use a builder pattern (Effective Java Items 2/17)",
+      "passed": true,
+      "evidence": "All three config classes (SmtpConfig, SmsConfig, PushConfig) are declared 'final', have private constructors taking a Builder, all fields are private final, and expose only accessor methods. Each provides a static builder() factory method returning a nested Builder class. For example, SmtpConfig.builder(\"host\", \"from\").port(587).useTls(true).credentials(\"user\", \"pass\").build(). Notification also uses builder pattern with immutable fields."
+    },
+    {
+      "text": "No raw types in generic code — proper use of parameterized types (Item 26)",
+      "passed": true,
+      "evidence": "All generic usages are properly parameterized: List<NotificationChannel> in NotificationService, List<String> and List<ChannelFailure> in NotificationResult, List<NotificationChannel> in the of() factory method. No raw List, Map, or other generic types appear anywhere in the codebase."
+    },
+    {
+      "text": "Returns a result object or collection rather than void/boolean to report per-channel status",
+      "passed": true,
+      "evidence": "NotificationService.send() returns NotificationResult, which contains List<String> succeededChannels and List<ChannelFailure> failures. It provides isFullSuccess(), isPartialSuccess(), and isCompleteFailure() query methods. ChannelFailure is a record holding channelName and the NotificationException."
+    },
+    {
+      "text": "Uses static factory methods or builders for object creation where appropriate (Items 1-2)",
+      "passed": true,
+      "evidence": "Static factory methods are used extensively: NotificationService.of(...) and NotificationService.fromChannels(...), EmailNotificationChannel.of(config), SmsNotificationChannel.of(config), PushNotificationChannel.of(config), Notification.builder(...), SmtpConfig.builder(...), SmsConfig.builder(...), PushConfig.builder(...). NotificationService's constructor is private, enforcing use of factories."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 125.3
+  },
+  "claims": [
+    {
+      "claim": "NotificationResult is immutable",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Fields are private final, lists use List.copyOf() in constructor which creates unmodifiable copies, class is declared final, no mutating methods exist."
+    },
+    {
+      "claim": "Notification is immutable",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Class is declared final, all fields are private final, private constructor, no setters. Uses builder pattern for construction."
+    },
+    {
+      "claim": "Channel implementations can be tested by overriding doSend()",
+      "type": "quality",
+      "verified": false,
+      "evidence": "The channel classes are declared 'final' (e.g., 'public final class EmailNotificationChannel'), which means doSend() cannot actually be overridden via subclassing despite being declared 'protected'. This is contradictory. Testing would require a different approach (e.g., dependency injection of a transport layer or using the NotificationChannel interface directly)."
+    }
+  ],
+  "user_notes_summary": null,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "No assertion checks whether the code compiles. All assertions can be satisfied by syntactically plausible but non-compilable code. Consider adding a compilation check assertion."
+      },
+      {
+        "reason": "No assertion checks for unit tests. A production-quality implementation would include tests demonstrating graceful degradation and per-channel result reporting. Consider adding 'Includes at least one test class that exercises multi-channel failure scenarios'."
+      },
+      {
+        "assertion": "Failure in one channel does not prevent other channels from sending (graceful degradation)",
+        "reason": "This assertion is verified by code inspection of the try/catch structure, but a stronger version would require a test that actually demonstrates this behavior by configuring a failing channel alongside a succeeding one."
+      }
+    ],
+    "overall": "Assertions cover the key design principles well (SOLID, Effective Java patterns). The main gap is the absence of any compilation or runtime verification -- all assertions are satisfied by static code inspection alone."
+  }
+}

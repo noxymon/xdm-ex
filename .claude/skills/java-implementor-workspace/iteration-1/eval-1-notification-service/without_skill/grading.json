@@ -1,0 +1,89 @@
+{
+  "expectations": [
+    {
+      "text": "Uses an interface or abstract type for notification channels (OCP/DIP)",
+      "passed": true,
+      "evidence": "NotificationChannel.java defines a public interface with getChannelName() and send() methods. All three channel implementations (Email, SMS, Push) implement this interface, allowing new channels to be added without modifying existing code."
+    },
+    {
+      "text": "Each channel (email, SMS, push) is a separate class implementing the interface (SRP)",
+      "passed": true,
+      "evidence": "EmailNotificationChannel, SmsNotificationChannel, and PushNotificationChannel are each separate classes that implement NotificationChannel. Each handles only its own delivery logic and validation."
+    },
+    {
+      "text": "NotificationService accepts channels via constructor injection, not internal instantiation (DIP)",
+      "passed": false,
+      "evidence": "NotificationService does NOT use constructor injection. It initializes an empty CopyOnWriteArrayList and channels are added via addChannel() method post-construction. The constructor takes no parameters. While this avoids internal instantiation of concrete channels (good), it fails the specific requirement of constructor injection -- it uses method injection instead."
+    },
+    {
+      "text": "Failure in one channel does not prevent other channels from sending (graceful degradation)",
+      "passed": true,
+      "evidence": "In NotificationService.send(), each channel call is wrapped in a try-catch that catches both NotificationException and generic Exception. On failure, it logs the error and adds a NotificationResult.failure() to the results list, then continues the for-loop to process remaining channels."
+    },
+    {
+      "text": "Configuration objects are immutable or use a builder pattern (Effective Java Items 2/17)",
+      "passed": true,
+      "evidence": "SmtpConfig, SmsConfig, and PushConfig all have private final fields with only getter methods and no setters. They are effectively immutable after construction. However, none use the builder pattern despite SmtpConfig having 6 constructor parameters, which is a candidate for builder per Item 2."
+    },
+    {
+      "text": "No raw types in generic code — proper use of parameterized types (Item 26)",
+      "passed": true,
+      "evidence": "All generic types are properly parameterized: List<NotificationChannel>, List<NotificationResult>, List<String>, CopyOnWriteArrayList<>(). No raw types found in any of the 11 Java files."
+    },
+    {
+      "text": "Returns a result object or collection rather than void/boolean to report per-channel status",
+      "passed": true,
+      "evidence": "NotificationService.send() returns List<NotificationResult>. NotificationResult is a dedicated result class with channelName, success boolean, and errorMessage fields. Static factory methods NotificationResult.success() and NotificationResult.failure() create instances for each channel outcome."
+    },
+    {
+      "text": "Uses static factory methods or builders for object creation where appropriate (Items 1-2)",
+      "passed": true,
+      "evidence": "NotificationResult uses static factory methods success(channelName) and failure(channelName, errorMessage) with a private constructor, which is a textbook application of Item 1. However, the config objects (SmtpConfig with 6 params, SmsConfig, PushConfig) all use public constructors directly and would benefit from builders per Item 2."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 1,
+    "total": 8,
+    "pass_rate": 0.875
+  },
+  "timing": {
+    "total_duration_seconds": 123.9
+  },
+  "claims": [
+    {
+      "claim": "The design follows the Open/Closed Principle",
+      "type": "quality",
+      "verified": true,
+      "evidence": "New notification channels can be added by implementing NotificationChannel without modifying NotificationService. The demo even shows adding an anonymous Slack channel at runtime."
+    },
+    {
+      "claim": "Thread safety via CopyOnWriteArrayList",
+      "type": "quality",
+      "verified": true,
+      "evidence": "NotificationService uses CopyOnWriteArrayList for the channels field, which is thread-safe for concurrent reads with infrequent writes."
+    },
+    {
+      "claim": "Config objects are immutable",
+      "type": "factual",
+      "verified": true,
+      "evidence": "All three config classes have only private final fields with getters and no setters. No way to mutate state after construction."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "NotificationService accepts channels via constructor injection, not internal instantiation (DIP)",
+        "reason": "This assertion conflates two concerns: (1) not instantiating concrete channels internally and (2) using constructor injection specifically. Method injection (addChannel) also satisfies DIP since the service depends on the abstraction and receives implementations from outside. Consider splitting into: 'does not internally instantiate concrete channels' and optionally 'supports constructor injection'."
+      },
+      {
+        "assertion": "Uses static factory methods or builders for object creation where appropriate (Items 1-2)",
+        "reason": "The 'where appropriate' qualifier makes this easy to pass with even one instance. SmtpConfig with 6 constructor parameters is a strong candidate for a builder pattern, and its absence could reasonably be a FAIL. Consider making the assertion more specific, e.g., 'Config objects with 4+ parameters use a builder'."
+      },
+      {
+        "reason": "No assertion checks for proper validation or defensive programming in the config constructors. All three config classes accept null values without validation, which could lead to NPEs at send time rather than at construction time. An assertion like 'Config constructors validate required parameters' would catch this."
+      }
+    ],
+    "overall": "Assertions cover the key SOLID principles and Effective Java patterns well. The main gap is that constructor injection is too specific when method injection also satisfies DIP, and the static factory assertion is too lenient due to the 'where appropriate' qualifier."
+  }
+}

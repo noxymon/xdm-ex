@@ -1,0 +1,94 @@
+{
+  "expectations": [
+    {
+      "text": "Cache is generic with type parameters <K, V> (Items 29-30)",
+      "passed": true,
+      "evidence": "Cache.java declares `public interface Cache<K, V>` with type parameters K and V. ConcurrentCache also declares `public final class ConcurrentCache<K, V> implements Cache<K, V>`. CacheBuilder similarly uses `<K, V>` type parameters throughout."
+    },
+    {
+      "text": "Eviction strategy is behind an interface, allowing new strategies without modifying Cache (OCP)",
+      "passed": true,
+      "evidence": "EvictionStrategy.java defines `public interface EvictionStrategy<K>` with methods onAccess, onPut, onRemove, evict, and clear. ConcurrentCache accepts any EvictionStrategy<K> via its constructor and CacheBuilder.evictionStrategy() method, so new strategies can be added without modifying Cache or ConcurrentCache."
+    },
+    {
+      "text": "Separate strategy implementations for LRU, LFU, and TTL (SRP)",
+      "passed": true,
+      "evidence": "Three separate final classes exist: LruEvictionStrategy.java (uses LinkedHashSet for access order), LfuEvictionStrategy.java (uses HashMap<K, Long> for frequency counts), and TtlEvictionStrategy.java (uses LinkedHashMap<K, Instant> with Duration and Clock). Each is in its own file with a single responsibility."
+    },
+    {
+      "text": "Uses a builder pattern for cache configuration (Item 2)",
+      "passed": true,
+      "evidence": "CacheBuilder.java implements a fluent builder with private constructor, static factory `newBuilder()`, and chainable methods: maxSize(), lru(), lfu(), ttl(), evictionStrategy(), and build(). Example usage: `CacheBuilder.<String, User>newBuilder().maxSize(1000).lru().build()`."
+    },
+    {
+      "text": "CacheStats is an immutable value object (Item 17)",
+      "passed": true,
+      "evidence": "CacheStatisticsSnapshot is declared `public final class` with `private final long` fields (hitCount, missCount, evictionCount) set only in the constructor. It overrides equals(), hashCode(), and toString(). No setters or mutable state. The Javadoc explicitly states 'This class is thread-safe because it is immutable (all fields are final and primitive).'"
+    },
+    {
+      "text": "Thread safety is achieved via ConcurrentHashMap or explicit synchronization (Items 78-81)",
+      "passed": true,
+      "evidence": "ConcurrentCache.java uses a ReentrantReadWriteLock for synchronization. All public methods acquire read or write locks in try/finally blocks. Statistics counters use AtomicLong for lock-free reads. While it uses HashMap (not ConcurrentHashMap) as the backing store, thread safety is achieved via the explicit ReadWriteLock, which satisfies the 'explicit synchronization' alternative in the expectation."
+    },
+    {
+      "text": "Cache interface is focused — no unrelated methods bundled in (ISP)",
+      "passed": true,
+      "evidence": "Cache.java contains exactly 6 methods: put, get, remove, clear, size, and statistics. All are directly related to cache operations. No unrelated concerns like serialization, persistence, or event listening are mixed in. The EvictionStrategy interface is similarly focused on eviction lifecycle only."
+    },
+    {
+      "text": "Returns Optional for get() operations rather than null (Item 55)",
+      "passed": true,
+      "evidence": "Cache.java declares `Optional<V> get(K key)` and ConcurrentCache.get() returns `Optional.of(value)` on hit and `Optional.empty()` on miss. The Javadoc states 'an Optional containing the value, or Optional.empty()'. No null returns anywhere in the get path."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 126.4
+  },
+  "claims": [
+    {
+      "claim": "ConcurrentCache allows concurrent reads via ReadWriteLock",
+      "type": "quality",
+      "verified": true,
+      "evidence": "The get() and size() methods acquire lock.readLock(), which permits multiple simultaneous readers. Write operations acquire lock.writeLock(), which is exclusive."
+    },
+    {
+      "claim": "Strategy implementations are not thread-safe, with the owning cache responsible for synchronization",
+      "type": "factual",
+      "verified": true,
+      "evidence": "All three strategy classes document this explicitly. ConcurrentCache wraps all strategy calls inside its ReadWriteLock, though there is a subtle issue: get() calls strategy.onAccess() under the read lock, but onAccess() mutates strategy state (e.g., reorders LinkedHashSet in LRU). This means concurrent reads could corrupt strategy state. This is a genuine thread-safety bug."
+    },
+    {
+      "claim": "TtlEvictionStrategy injects a Clock for testability",
+      "type": "factual",
+      "verified": true,
+      "evidence": "TtlEvictionStrategy has a constructor accepting (Duration ttl, Clock clock) and CacheBuilder exposes a ttl(Duration, Clock) overload."
+    },
+    {
+      "claim": "CacheBuilder validates configuration before building",
+      "type": "factual",
+      "verified": true,
+      "evidence": "build() throws IllegalStateException if maxSize < 1 or strategy is null. maxSize() throws IllegalArgumentException if maxSize < 1."
+    }
+  ],
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "reason": "There is a thread-safety bug: ConcurrentCache.get() calls strategy.onAccess(key) while holding only the read lock, but onAccess() mutates mutable state in the strategy (e.g., LinkedHashSet.remove/add in LRU, HashMap.computeIfPresent in LFU). Concurrent reads will corrupt strategy state. No assertion checks for correct thread-safety implementation beyond surface-level use of locks. An assertion like 'get() operations that modify eviction metadata acquire the write lock' would catch this."
+      },
+      {
+        "assertion": "CacheStats is an immutable value object (Item 17)",
+        "reason": "The expectation name says 'CacheStats' but the actual class is 'CacheStatisticsSnapshot'. While this still passes (the intent is clear), the assertion could be more precise. Also, CacheStatistics is an interface, not a value object -- the value object is CacheStatisticsSnapshot. A stronger assertion would check that CacheStatisticsSnapshot is a record or has no setters."
+      },
+      {
+        "reason": "No assertion checks that the cache actually compiles. A compilation check would catch import issues (all files lack package declarations and import from the default package, which is fine for a demo but unusual)."
+      }
+    ],
+    "overall": "All 8 assertions pass and test meaningful design properties. The main gap is the uncaught thread-safety bug where get() mutates strategy state under a read lock, which contradicts the thread-safety assertion's intent. Consider adding a behavioral correctness assertion for concurrent access."
+  }
+}

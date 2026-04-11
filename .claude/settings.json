@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"TaskCompleted\",\"additionalContext\":\"A task was just completed. Run /claude-md-management:claude-md-improver to check if CLAUDE.md needs updating based on what was learned so you don't make that mistake again.\"}}'",
+            "timeout": 5,
+            "statusMessage": "Checking if CLAUDE.md needs update..."
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true
+  }
+}

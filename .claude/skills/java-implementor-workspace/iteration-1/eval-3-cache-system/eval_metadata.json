@@ -1,0 +1,15 @@
+{
+  "eval_id": 3,
+  "eval_name": "cache-system",
+  "prompt": "Design and implement a Java caching system with multiple eviction strategies, configurable max size, thread-safe access, and cache statistics.",
+  "assertions": [
+    "Cache is generic with type parameters <K, V> (Items 29-30)",
+    "Eviction strategy is behind an interface, allowing new strategies without modifying Cache (OCP)",
+    "Separate strategy implementations for LRU, LFU, and TTL (SRP)",
+    "Uses a builder pattern for cache configuration (Item 2)",
+    "CacheStats is an immutable value object (Item 17)",
+    "Thread safety is achieved via ConcurrentHashMap or explicit synchronization (Items 78-81)",
+    "Cache interface is focused — no unrelated methods bundled in (ISP)",
+    "Returns Optional for get() operations rather than null (Item 55)"
+  ]
+}

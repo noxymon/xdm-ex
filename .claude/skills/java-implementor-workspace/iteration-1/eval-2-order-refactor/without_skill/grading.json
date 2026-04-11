@@ -1,0 +1,91 @@
+{
+  "expectations": [
+    {
+      "text": "CustomerType is an enum with discount logic, not string comparisons (Item 34, OCP)",
+      "passed": true,
+      "evidence": "CustomerType.java defines `public enum CustomerType { REGULAR(0.0), PREMIUM(0.10), VIP(0.20); }` with a `discountRate` field and `applyDiscount(double total)` method. No string comparisons are used."
+    },
+    {
+      "text": "Order items are typed value objects, not Map<String, Object> (type safety)",
+      "passed": true,
+      "evidence": "OrderItem.java is an immutable class with typed fields `String productId`, `int quantity`, `double price`, constructor validation, and a `getLineTotal()` method. Order.java holds `List<OrderItem>`, not Map<String, Object>."
+    },
+    {
+      "text": "Repository/persistence is behind an interface, not direct JDBC in business logic (DIP/SRP)",
+      "passed": true,
+      "evidence": "OrderRepository.java and InventoryRepository.java are interfaces. JDBC is confined to JdbcOrderRepository and JdbcInventoryRepository. OrderProcessor depends only on the interfaces (via InventoryValidator and OrderRepository)."
+    },
+    {
+      "text": "Inventory checking is separated from order processing (SRP)",
+      "passed": true,
+      "evidence": "InventoryValidator.java is a standalone class that handles inventory validation. OrderProcessor delegates to it via `inventoryValidator.validate(items)` on line 35."
+    },
+    {
+      "text": "Email/notification sending is separated from order processing (SRP)",
+      "passed": true,
+      "evidence": "EmailService.java is an interface for sending emails. OrderConfirmationNotifier.java is a separate class that composes CustomerRepository and EmailService. OrderProcessor delegates to `confirmationNotifier.notify(order)` on line 42."
+    },
+    {
+      "text": "Dependencies are injected via constructor, not created internally (DIP, Item 5)",
+      "passed": true,
+      "evidence": "OrderProcessor's constructor takes InventoryValidator, PricingService, OrderRepository, and OrderConfirmationNotifier as parameters. Similarly, InventoryValidator injects InventoryRepository, OrderConfirmationNotifier injects CustomerRepository and EmailService, and JDBC repos inject Connection. No `new` calls for dependencies inside business logic."
+    },
+    {
+      "text": "Uses try-with-resources for any database resources (Item 9)",
+      "passed": true,
+      "evidence": "JdbcInventoryRepository.getStock() uses nested try-with-resources: `try (PreparedStatement ps = ...) { try (ResultSet rs = ...) { ... } }`. JdbcOrderRepository.save() uses `try (PreparedStatement ps = ...)`. All JDBC resources are properly managed."
+    },
+    {
+      "text": "Returns a meaningful result type instead of bare boolean (Item 55)",
+      "passed": true,
+      "evidence": "OrderProcessor.processOrder() returns `Order` (a domain object with customerId, customerType, items, and total), not a bare boolean."
+    },
+    {
+      "text": "Uses BigDecimal or long-based money instead of double for monetary values (Item 60)",
+      "passed": false,
+      "evidence": "All monetary values use `double`: OrderItem.price is `double`, OrderItem.getLineTotal() returns `double`, Order.total is `double`, PricingService.calculateTotal() returns `double`, CustomerType.applyDiscount() takes and returns `double`. No BigDecimal or long-based money representation is used anywhere."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 1,
+    "total": 9,
+    "pass_rate": 0.89
+  },
+  "timing": {
+    "total_duration_seconds": 63.3
+  },
+  "claims": [
+    {
+      "claim": "OrderItem validates its inputs in the constructor",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Constructor checks for null/blank productId, non-positive quantity, and negative price, throwing IllegalArgumentException for each."
+    },
+    {
+      "claim": "Order.items is defensively copied to be immutable",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Order constructor uses `List.copyOf(items)` which creates an unmodifiable copy."
+    },
+    {
+      "claim": "JDBC implementations wrap SQLException into domain exceptions",
+      "type": "quality",
+      "verified": true,
+      "evidence": "JdbcInventoryRepository wraps SQLException into InventoryException. JdbcOrderRepository wraps into RuntimeException (inconsistent — should arguably use a domain exception too)."
+    }
+  ],
+  "user_notes_summary": null,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Repository/persistence is behind an interface, not direct JDBC in business logic (DIP/SRP)",
+        "reason": "This assertion would also pass if someone created an interface but still leaked JDBC types (e.g., throwing SQLException). Consider also checking that no java.sql imports appear in the business logic classes (OrderProcessor, PricingService, etc.)."
+      },
+      {
+        "reason": "No assertion checks whether OrderProcessor is actually testable — e.g., that all collaborators are mockable interfaces. PricingService is a concrete class injected directly, which slightly undermines the DIP principle, though it's still constructor-injected."
+      }
+    ],
+    "overall": "Assertions are well-targeted and discriminating. The BigDecimal expectation correctly caught a real deficiency. One gap: PricingService is a concrete dependency rather than an interface, which no assertion catches."
+  }
+}

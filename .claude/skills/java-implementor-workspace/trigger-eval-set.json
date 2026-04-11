@@ -1,0 +1,82 @@
+[
+  {
+    "query": "I need to build a PaymentGateway service in Java that supports credit cards, PayPal, and crypto. Each provider has its own SDK and auth flow. The service needs to be extensible so we can add Apple Pay later without touching existing code. We're using Spring Boot 3.2 and Java 21.",
+    "should_trigger": true
+  },
+  {
+    "query": "can you refactor this OrderProcessor class? it's like 400 lines long and does validation, pricing, inventory checks, db writes, and email sending all in one method. here's the file: src/main/java/com/acme/orders/OrderProcessor.java",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm designing a notification system for our internal tool. Users can get notified via email, slack, and in-app. Each channel has different templates and retry logic. What's the best way to architect this in Java so it's clean and testable?",
+    "should_trigger": true
+  },
+  {
+    "query": "We have a bunch of DTOs in our codebase that are mutable with public fields and no validation. I want to convert them to proper immutable value objects with builders. Start with UserProfile.java and AccountSettings.java in the com.corp.model package.",
+    "should_trigger": true
+  },
+  {
+    "query": "implement a generic cache with LRU eviction in java. needs to be thread-safe, configurable max size, and support TTL expiration. something like Guava's CacheBuilder but simpler",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm working on a document processing pipeline — PDFs come in, get parsed, validated against schemas, transformed, and exported to different formats (JSON, XML, CSV). Each step can fail independently. What design patterns should I use here? This is a Java 17 project with no frameworks.",
+    "should_trigger": true
+  },
+  {
+    "query": "our team lead says we need to apply the strategy pattern for our discount calculation but I'm not sure how to structure it. right now we have a big switch on CustomerType in DiscountService.java. can you show me how to refactor it properly?",
+    "should_trigger": true
+  },
+  {
+    "query": "Create an event-driven audit logging system in Java. Different events (UserLogin, OrderPlaced, PaymentProcessed) need to be observed by multiple listeners (DatabaseLogger, FileLogger, AlertService). The listeners should be pluggable and the system should follow SOLID principles.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need a state machine for order lifecycle management: PENDING -> CONFIRMED -> SHIPPED -> DELIVERED, with CANCELLED possible from PENDING or CONFIRMED. Each transition should validate preconditions and trigger side effects. Java implementation please.",
+    "should_trigger": true
+  },
+  {
+    "query": "we're building a REST API with Spring Boot and need to add rate limiting middleware. The rate limiter should support different strategies (fixed window, sliding window, token bucket) that can be swapped via config. Also need per-user and per-endpoint limits.",
+    "should_trigger": true
+  },
+  {
+    "query": "write a python script that scrapes product prices from amazon and stores them in a sqlite database. use beautifulsoup and requests. schedule it to run every 6 hours with cron.",
+    "should_trigger": false
+  },
+  {
+    "query": "I need help setting up a CI/CD pipeline with GitHub Actions for our Java project. The workflow should run mvn test on PRs, build the JAR on merge to main, and deploy to AWS ECS. Here's our current Dockerfile.",
+    "should_trigger": false
+  },
+  {
+    "query": "can you explain the difference between TCP and UDP? I'm trying to decide which protocol to use for our game server's networking layer. latency is more important than reliability for player movement updates.",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the SQL query in reports/monthly_revenue.sql — it's doing a full table scan on the orders table instead of using the idx_orders_created_at index. The EXPLAIN output is in the attached screenshot.",
+    "should_trigger": false
+  },
+  {
+    "query": "I'm learning React and want to build a todo app with TypeScript. Can you help me set up the project with Vite, add a TodoList component with add/delete/toggle functionality, and use the observer pattern for state management?",
+    "should_trigger": false
+  },
+  {
+    "query": "our kubernetes pods keep getting OOMKilled. the java app is running with -Xmx512m but the container limit is 512Mi. can you help me figure out the right memory settings? here's our deployment.yaml",
+    "should_trigger": false
+  },
+  {
+    "query": "write unit tests for the UserService class in src/test/java/com/app/service/UserServiceTest.java. Use JUnit 5 and Mockito. The service has methods for registration, login, and password reset. Mock the UserRepository and EmailService dependencies.",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to migrate our MySQL database schema — add a new 'preferences' JSONB column to the users table, backfill it from the old settings table, and create an index. Write the Flyway migration scripts.",
+    "should_trigger": false
+  },
+  {
+    "query": "help me configure log4j2.xml for our spring boot app. we need structured JSON logging to stdout for kubernetes, with different log levels per package (com.acme.service=DEBUG, org.hibernate=WARN). also add MDC for request tracing.",
+    "should_trigger": false
+  },
+  {
+    "query": "I want to add Swagger/OpenAPI documentation to our existing Spring Boot REST controllers. The endpoints are in src/main/java/com/api/controllers/. Just add the annotations and configure the Swagger UI endpoint, don't change any business logic.",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "skill_name": "java-implementor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a NotificationService in Java that can send notifications via email, SMS, and push notifications. Each channel has different configuration (SMTP settings for email, API keys for SMS, device tokens for push). The service should support sending to multiple channels at once and handle failures gracefully — if one channel fails, the others should still send. Also need a way to add new notification channels in the future without changing existing code.",
+      "expected_output": "Interface-based channels, constructor-injected service, immutable configs, graceful per-channel error handling, result reporting.",
+      "files": [],
+      "expectations": [
+        "Uses an interface or abstract type for notification channels (OCP/DIP)",
+        "Each channel (email, SMS, push) is a separate class implementing the interface (SRP)",
+        "NotificationService accepts channels via constructor injection, not internal instantiation (DIP)",
+        "Failure in one channel does not prevent other channels from sending (graceful degradation)",
+        "Configuration objects are immutable or use a builder pattern (Effective Java Items 2/17)",
+        "No raw types in generic code — proper use of parameterized types (Item 26)",
+        "Returns a result object or collection rather than void/boolean to report per-channel status",
+        "Uses static factory methods or builders for object creation where appropriate (Items 1-2)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Refactor the OrderProcessor class into clean, well-designed Java code.",
+      "expected_output": "CustomerType enum, typed value objects, repository interfaces, separated concerns, DI, try-with-resources, BigDecimal for money.",
+      "files": [],
+      "expectations": [
+        "CustomerType is an enum with discount logic, not string comparisons (Item 34, OCP)",
+        "Order items are typed value objects, not Map<String, Object> (type safety)",
+        "Repository/persistence is behind an interface, not direct JDBC in business logic (DIP/SRP)",
+        "Inventory checking is separated from order processing (SRP)",
+        "Email/notification sending is separated from order processing (SRP)",
+        "Dependencies are injected via constructor, not created internally (DIP, Item 5)",
+        "Uses try-with-resources for any database resources (Item 9)",
+        "Returns a meaningful result type instead of bare boolean (Item 55)",
+        "Uses BigDecimal or long-based money instead of double for monetary values (Item 60)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Design and implement a Java caching system with multiple eviction strategies, configurable max size, thread-safe access, and cache statistics.",
+      "expected_output": "Generic Cache<K,V> interface, strategy pattern for eviction, builder for config, immutable stats, thread-safe internals, Optional returns.",
+      "files": [],
+      "expectations": [
+        "Cache is generic with type parameters <K, V> (Items 29-30)",
+        "Eviction strategy is behind an interface, allowing new strategies without modifying Cache (OCP)",
+        "Separate strategy implementations for LRU, LFU, and TTL (SRP)",
+        "Uses a builder pattern for cache configuration (Item 2)",
+        "CacheStats is an immutable value object (Item 17)",
+        "Thread safety is achieved via ConcurrentHashMap or explicit synchronization (Items 78-81)",
+        "Cache interface is focused — no unrelated methods bundled in (ISP)",
+        "Returns Optional for get() operations rather than null (Item 55)"
+      ]
+    }
+  ]
+}

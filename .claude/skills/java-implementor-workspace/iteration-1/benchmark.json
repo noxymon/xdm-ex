@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "skill_name": "java-implementor",
+    "skill_path": ".claude/skills/java-implementor",
+    "executor_model": "claude-opus-4-6",
+    "analyzer_model": "claude-opus-4-6",
+    "timestamp": "2026-04-07T06:00:00Z",
+    "evals_run": [1, 2, 3],
+    "runs_per_configuration": 1
+  },
+
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "notification-service",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 125.3,
+        "tokens": 24185,
+        "tool_calls": 15,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses an interface or abstract type for notification channels (OCP/DIP)", "passed": true, "evidence": "NotificationChannel interface with send() and channelName()"},
+        {"text": "Each channel (email, SMS, push) is a separate class implementing the interface (SRP)", "passed": true, "evidence": "EmailNotificationChannel, SmsNotificationChannel, PushNotificationChannel"},
+        {"text": "NotificationService accepts channels via constructor injection (DIP)", "passed": true, "evidence": "Private constructor takes List<NotificationChannel>, factory methods of() and fromChannels()"},
+        {"text": "Failure in one channel does not prevent other channels from sending", "passed": true, "evidence": "Per-channel try/catch in send loop"},
+        {"text": "Configuration objects are immutable or use a builder pattern (Items 2/17)", "passed": true, "evidence": "All config classes are final, private final fields, builder pattern"},
+        {"text": "No raw types in generic code (Item 26)", "passed": true, "evidence": "All generics properly parameterized"},
+        {"text": "Returns a result object or collection for per-channel status", "passed": true, "evidence": "NotificationResult with succeeded/failed lists"},
+        {"text": "Uses static factory methods or builders (Items 1-2)", "passed": true, "evidence": "Factory methods throughout: of(), builder(), fromChannels()"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "notification-service",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 123.9,
+        "tokens": 20091,
+        "tool_calls": 13,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses an interface or abstract type for notification channels (OCP/DIP)", "passed": true, "evidence": "NotificationChannel interface"},
+        {"text": "Each channel is a separate class implementing the interface (SRP)", "passed": true, "evidence": "Three separate channel classes"},
+        {"text": "NotificationService accepts channels via constructor injection (DIP)", "passed": false, "evidence": "Uses addChannel() method injection, not constructor injection"},
+        {"text": "Failure in one channel does not prevent other channels from sending", "passed": true, "evidence": "Per-channel try/catch"},
+        {"text": "Configuration objects are immutable or use a builder pattern (Items 2/17)", "passed": true, "evidence": "Immutable configs but no builder for 6-param SmtpConfig"},
+        {"text": "No raw types in generic code (Item 26)", "passed": true, "evidence": "All properly parameterized"},
+        {"text": "Returns a result object or collection for per-channel status", "passed": true, "evidence": "List<NotificationResult>"},
+        {"text": "Uses static factory methods or builders (Items 1-2)", "passed": true, "evidence": "Factory methods on NotificationResult"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "order-refactor",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 81.4,
+        "tokens": 32043,
+        "tool_calls": 15,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "CustomerType is an enum with discount logic (Item 34, OCP)", "passed": true, "evidence": "Enum with REGULAR(0.00), PREMIUM(0.10), VIP(0.20)"},
+        {"text": "Order items are typed value objects (type safety)", "passed": true, "evidence": "Immutable OrderItem with BigDecimal price"},
+        {"text": "Repository/persistence behind an interface (DIP/SRP)", "passed": true, "evidence": "OrderRepository interface"},
+        {"text": "Inventory checking separated from order processing (SRP)", "passed": true, "evidence": "InventoryService interface"},
+        {"text": "Email/notification separated from order processing (SRP)", "passed": true, "evidence": "NotificationService interface"},
+        {"text": "Dependencies injected via constructor (DIP, Item 5)", "passed": true, "evidence": "All three interfaces constructor-injected with requireNonNull"},
+        {"text": "Uses try-with-resources for database resources (Item 9)", "passed": true, "evidence": "No raw JDBC in business logic (behind interface)"},
+        {"text": "Returns meaningful result type instead of boolean (Item 55)", "passed": true, "evidence": "Returns BigDecimal total"},
+        {"text": "Uses BigDecimal for monetary values (Item 60)", "passed": true, "evidence": "BigDecimal throughout with proper rounding"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "order-refactor",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.89,
+        "passed": 8,
+        "failed": 1,
+        "total": 9,
+        "time_seconds": 63.3,
+        "tokens": 17718,
+        "tool_calls": 17,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "CustomerType is an enum with discount logic (Item 34, OCP)", "passed": true, "evidence": "Enum with discount rates"},
+        {"text": "Order items are typed value objects (type safety)", "passed": true, "evidence": "OrderItem class with typed fields"},
+        {"text": "Repository/persistence behind an interface (DIP/SRP)", "passed": true, "evidence": "OrderRepository and InventoryRepository interfaces"},
+        {"text": "Inventory checking separated from order processing (SRP)", "passed": true, "evidence": "InventoryValidator class"},
+        {"text": "Email/notification separated from order processing (SRP)", "passed": true, "evidence": "EmailService interface, OrderConfirmationNotifier"},
+        {"text": "Dependencies injected via constructor (DIP, Item 5)", "passed": true, "evidence": "Constructor injection throughout"},
+        {"text": "Uses try-with-resources for database resources (Item 9)", "passed": true, "evidence": "try-with-resources in JDBC repos"},
+        {"text": "Returns meaningful result type instead of boolean (Item 55)", "passed": true, "evidence": "Returns Order domain object"},
+        {"text": "Uses BigDecimal for monetary values (Item 60)", "passed": false, "evidence": "All monetary values use double, not BigDecimal"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "cache-system",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 126.4,
+        "tokens": 36400,
+        "tool_calls": 14,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Cache is generic with type parameters <K, V> (Items 29-30)", "passed": true, "evidence": "Cache<K,V> interface and ConcurrentCache<K,V>"},
+        {"text": "Eviction strategy behind an interface (OCP)", "passed": true, "evidence": "EvictionStrategy<K> interface, no instanceof checks"},
+        {"text": "Separate strategy implementations for LRU, LFU, TTL (SRP)", "passed": true, "evidence": "Three separate final classes"},
+        {"text": "Builder pattern for cache configuration (Item 2)", "passed": true, "evidence": "CacheBuilder with fluent API and validation"},
+        {"text": "CacheStats is an immutable value object (Item 17)", "passed": true, "evidence": "CacheStatisticsSnapshot: final class, final fields, equals/hashCode"},
+        {"text": "Thread safety via synchronization (Items 78-81)", "passed": true, "evidence": "ReentrantReadWriteLock + AtomicLong counters"},
+        {"text": "Cache interface is focused (ISP)", "passed": true, "evidence": "Only cache-related methods: put, get, remove, clear, size, statistics"},
+        {"text": "Returns Optional for get() (Item 55)", "passed": true, "evidence": "Optional<V> get(K key)"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "cache-system",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 137.1,
+        "tokens": 22221,
+        "tool_calls": 11,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Cache is generic with type parameters <K, V> (Items 29-30)", "passed": true, "evidence": "Cache<K, V> class"},
+        {"text": "Eviction strategy behind an interface (OCP)", "passed": false, "evidence": "Cache contains instanceof TTLEvictionStrategy checks — OCP violation"},
+        {"text": "Separate strategy implementations for LRU, LFU, TTL (SRP)", "passed": true, "evidence": "Three separate strategy classes"},
+        {"text": "Builder pattern for cache configuration (Item 2)", "passed": true, "evidence": "CacheConfig.Builder with fluent API"},
+        {"text": "CacheStats is an immutable value object (Item 17)", "passed": false, "evidence": "CacheStatistics is mutable with recordHit(), recordMiss(), reset()"},
+        {"text": "Thread safety via synchronization (Items 78-81)", "passed": true, "evidence": "ConcurrentHashMap + ReentrantReadWriteLock + AtomicLong"},
+        {"text": "Cache interface is focused (ISP)", "passed": true, "evidence": "Only cache-related methods"},
+        {"text": "Returns Optional for get() (Item 55)", "passed": true, "evidence": "Optional<V> get(K key)"}
+      ]
+    }
+  ],
+
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 111.0, "stddev": 25.4, "min": 81.4, "max": 126.4},
+      "tokens": {"mean": 30876, "stddev": 6200, "min": 24185, "max": 36400}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.838, "stddev": 0.074, "min": 0.75, "max": 0.89},
+      "time_seconds": {"mean": 108.1, "stddev": 39.5, "min": 63.3, "max": 137.1},
+      "tokens": {"mean": 20010, "stddev": 2266, "min": 17718, "max": 22221}
+    },
+    "delta": {
+      "pass_rate": "+0.162",
+      "time_seconds": "+2.9",
+      "tokens": "+10866"
+    }
+  },
+
+  "notes": [
+    "With-skill achieved 100% pass rate across all 3 evals (25/25 assertions) vs 84% without skill (21/25)",
+    "The skill's biggest impact was on Eval 3 (cache system): 100% vs 75% — caught OCP violation (instanceof) and immutability gap",
+    "BigDecimal for money (Item 60) was the discriminating assertion in Eval 2 — with-skill used BigDecimal, without-skill used double",
+    "Constructor injection vs method injection was the differentiator in Eval 1 — with-skill used private constructor + factory, baseline used addChannel()",
+    "With-skill runs used ~54% more tokens on average, reflecting the time spent reading and applying the skill's guidance",
+    "Time delta is minimal (+2.9s average) — the extra tokens didn't significantly slow execution",
+    "Several assertions were identified as non-discriminating: try-with-resources is trivially satisfied when persistence is behind an interface, raw types are rarely an issue in modern Java"
+  ]
+}

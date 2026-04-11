@@ -1,0 +1,94 @@
+{
+  "expectations": [
+    {
+      "text": "CustomerType is an enum with discount logic, not string comparisons (Item 34, OCP)",
+      "passed": true,
+      "evidence": "CustomerType.java defines an enum with REGULAR(0.00), PREMIUM(0.10), VIP(0.20) and a discountRate() method. Discount rates are embedded in enum constants, eliminating string comparisons. DiscountCalculator.applyDiscount uses customerType.discountRate() directly."
+    },
+    {
+      "text": "Order items are typed value objects, not Map<String, Object> (type safety)",
+      "passed": true,
+      "evidence": "OrderItem.java is an immutable final class with typed fields: String productId, int quantity, BigDecimal unitPrice. Constructor validates all inputs. OrderProcessor.processOrder accepts List<OrderItem>, not Map<String, Object>."
+    },
+    {
+      "text": "Repository/persistence is behind an interface, not direct JDBC in business logic (DIP/SRP)",
+      "passed": true,
+      "evidence": "OrderRepository.java is an interface with a single method save(String customerId, BigDecimal total). OrderProcessor depends on this interface, injected via constructor. No JDBC code appears anywhere in the output files."
+    },
+    {
+      "text": "Inventory checking is separated from order processing (SRP)",
+      "passed": true,
+      "evidence": "InventoryService.java is a separate interface with isAvailable(String productId, int requiredQuantity). OrderProcessor delegates to this interface in validateInventory() rather than containing inventory logic itself."
+    },
+    {
+      "text": "Email/notification sending is separated from order processing (SRP)",
+      "passed": true,
+      "evidence": "NotificationService.java is a separate interface with sendOrderConfirmation(String customerId, BigDecimal orderTotal). OrderProcessor delegates to this interface rather than containing notification logic."
+    },
+    {
+      "text": "Dependencies are injected via constructor, not created internally (DIP, Item 5)",
+      "passed": true,
+      "evidence": "OrderProcessor constructor takes InventoryService, OrderRepository, and NotificationService as parameters, all validated with Objects.requireNonNull. No 'new' instantiation of dependencies inside OrderProcessor."
+    },
+    {
+      "text": "Uses try-with-resources for any database resources (Item 9)",
+      "passed": true,
+      "evidence": "No database resources (Connection, Statement, ResultSet) are opened in any output file. Persistence is behind the OrderRepository interface, so the business logic has no database resources to manage. The expectation is trivially satisfied since the refactoring correctly pushed resource management behind the interface boundary."
+    },
+    {
+      "text": "Returns a meaningful result type instead of bare boolean (Item 55)",
+      "passed": true,
+      "evidence": "OrderProcessor.processOrder returns BigDecimal (the final order total after discount), not boolean. InsufficientStockException is used for failure cases with productId and requestedQuantity fields, providing rich failure information."
+    },
+    {
+      "text": "Uses BigDecimal or long-based money instead of double for monetary values (Item 60)",
+      "passed": true,
+      "evidence": "OrderItem.unitPrice is BigDecimal, OrderItem.lineTotal() returns BigDecimal, DiscountCalculator.applyDiscount operates on BigDecimal with setScale(2, RoundingMode.HALF_UP), OrderProcessor.processOrder returns BigDecimal, OrderRepository.save accepts BigDecimal total, NotificationService.sendOrderConfirmation accepts BigDecimal orderTotal. However, CustomerType.discountRate is a double -- this is a rate/percentage, not a monetary value, so it is acceptable."
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  },
+  "timing": {
+    "total_duration_seconds": 81.4
+  },
+  "claims": [
+    {
+      "claim": "OrderItem is immutable",
+      "type": "quality",
+      "verified": true,
+      "evidence": "Class is final, all fields are private final, no setters. Constructor validates and assigns. However, it lacks equals/hashCode overrides, which limits its utility as a true value object."
+    },
+    {
+      "claim": "Adding a new customer tier requires only adding a new enum constant (OCP)",
+      "type": "quality",
+      "verified": true,
+      "evidence": "DiscountCalculator.applyDiscount reads the rate from customerType.discountRate(), so a new enum constant with its rate requires no code changes elsewhere."
+    },
+    {
+      "claim": "InsufficientStockException is checked because the caller can reasonably recover",
+      "type": "quality",
+      "verified": true,
+      "evidence": "InsufficientStockException extends Exception (not RuntimeException), making it checked. The Javadoc rationale is reasonable."
+    }
+  ],
+  "user_notes_summary": null,
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "Uses try-with-resources for any database resources (Item 9)",
+        "reason": "This assertion is trivially satisfied when persistence is behind an interface (which is the correct design). Since no database resources exist in the business layer, the assertion cannot discriminate between good code and code that simply omitted persistence entirely. Consider rephrasing to 'No raw JDBC or resource-leak-prone code in business logic' or testing a concrete repository implementation."
+      },
+      {
+        "reason": "No assertion checks that OrderItem overrides equals/hashCode -- for a value object this is an important Effective Java concern (Items 10-11). The output lacks these overrides."
+      },
+      {
+        "reason": "No assertion checks that the discount rate stored in CustomerType avoids double -- while discountRate is a rate not money, the multiplication path goes through BigDecimal.valueOf(customerType.discountRate()) which could introduce subtle precision issues. A stricter eval might require BigDecimal throughout."
+      }
+    ],
+    "overall": "The assertions are well-chosen and cover the key design principles. The try-with-resources assertion is the weakest since it is trivially satisfied by the interface-based design. Consider adding assertions for value object completeness (equals/hashCode) and verifying the output compiles."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "eval_id": 2,
+  "eval_name": "order-refactor",
+  "prompt": "Refactor the OrderProcessor class into clean, well-designed Java code following best practices.",
+  "assertions": [
+    "CustomerType is an enum with discount logic, not string comparisons (Item 34, OCP)",
+    "Order items are typed value objects, not Map<String, Object> (type safety)",
+    "Repository/persistence is behind an interface, not direct JDBC in business logic (DIP/SRP)",
+    "Inventory checking is separated from order processing (SRP)",
+    "Email/notification sending is separated from order processing (SRP)",
+    "Dependencies are injected via constructor, not created internally (DIP, Item 5)",
+    "Uses try-with-resources for any database resources (Item 9)",
+    "Returns a meaningful result type instead of bare boolean (Item 55)",
+    "Uses BigDecimal or long-based money instead of double for monetary values (Item 60)"
+  ]
+}
