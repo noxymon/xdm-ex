@@ -1,5 +1,21 @@
 package xdman.monitoring;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+
 import xdman.Config;
 import xdman.XDMApp;
 import xdman.XDMConstants;
@@ -16,13 +32,6 @@ import xdman.util.FormatUtilities;
 import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
-
-import java.io.*;
-import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.*;
 
 public class MonitoringSession implements Runnable {
 	// private String msg204 = "HTTP/1.1 204 No Content\r\n" + "Content-length:
@@ -47,14 +56,29 @@ public class MonitoringSession implements Runnable {
 		t.start();
 	}
 
+	private void addCorsHeaders(HeaderCollection headers) {
+		headers.setValue("Access-Control-Allow-Origin", "*");
+		headers.setValue("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+		headers.setValue("Access-Control-Allow-Headers", "Content-Type");
+	}
+
 	private void setResponseOk(Response res) {
 		res.setCode(200);
 		res.setMessage("OK");
 		HeaderCollection headers = new HeaderCollection();
 		headers.setValue("content-type", "application/json");
 		headers.setValue("Cache-Control", "max-age=0, no-cache, must-revalidate");
+		addCorsHeaders(headers);
 		res.setHeaders(headers);
 		Logger.log("Response set");
+	}
+
+	private void handleOptions(Response res) {
+		res.setCode(204);
+		res.setMessage("No Content");
+		HeaderCollection headers = new HeaderCollection();
+		addCorsHeaders(headers);
+		res.setHeaders(headers);
 	}
 
 	private void onDownload(Request request, Response res) throws UnsupportedEncodingException {
@@ -119,6 +143,7 @@ public class MonitoringSession implements Runnable {
 		res.setMessage("No Content");
 		HeaderCollection headers = new HeaderCollection();
 		headers.setValue("Cache-Control", "max-age=0, no-cache, must-revalidate");
+		addCorsHeaders(headers);
 		res.setHeaders(headers);
 		Logger.log("Response set for 204");
 	}
@@ -246,6 +271,11 @@ public class MonitoringSession implements Runnable {
 	// }
 
 	private void processRequest(Request request, Response res) throws IOException {
+		// Handle CORS preflight OPTIONS request
+		if ("OPTIONS".equals(request.getMethodStr())) {
+			handleOptions(res);
+			return;
+		}
 		String verb = request.getUrl();
 		if (verb.equals("/sync")) {
 			onSync(request, response);

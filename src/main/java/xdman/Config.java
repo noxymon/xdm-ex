@@ -1,16 +1,19 @@
 package xdman;
 
-import xdman.util.Logger;
-import xdman.util.StringUtils;
-import xdman.util.XDMUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import xdman.util.Logger;
+import xdman.util.StringUtils;
+import xdman.util.XDMUtils;
 
 public class Config {
 	private boolean forceSingleFolder;
@@ -72,10 +75,12 @@ public class Config {
 	}
 
 	public void save() {
+		File file = new File(System.getProperty("user.home"), ".xdman/config.txt");
+		File tmpFile = new File(file.getParentFile(), "config.txt.tmp");
 		FileWriter fw = null;
+		boolean writeComplete = false;
 		try {
-			File file = new File(System.getProperty("user.home"), ".xdman/config.txt");
-			fw = new FileWriter(file);
+			fw = new FileWriter(tmpFile);
 
 			String newLine = "\n";
 
@@ -144,12 +149,38 @@ public class Config {
 			fw.write("showVideoListOnlyInBrowser:" + this.showVideoListOnlyInBrowser + newLine);
 			fw.write("zoomLevelIndex:" + this.zoomLevelIndex + newLine);
 
+			fw.flush();
+			writeComplete = true;
 		} catch (Exception e) {
+			Logger.log("Config write failed: " + e.getMessage());
 		}
 		try {
 			if (fw != null)
 				fw.close();
 		} catch (Exception e) {
+		}
+		if (!writeComplete) {
+			Logger.log("Config save incomplete; discarding tmp file to protect existing config");
+			if (tmpFile.exists()) {
+				tmpFile.delete();
+			}
+			return;
+		}
+		// Atomic move: tmp -> config.txt
+		try {
+			if (tmpFile.exists()) {
+				try {
+					Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
+							StandardCopyOption.ATOMIC_MOVE);
+				} catch (AtomicMoveNotSupportedException e) {
+					tmpFile.renameTo(file);
+				}
+			}
+		} catch (Exception e) {
+			Logger.log("Config atomic move failed: " + e.getMessage());
+			if (tmpFile.exists()) {
+				tmpFile.delete();
+			}
 		}
 	}
 

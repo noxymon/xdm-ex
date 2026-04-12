@@ -1,6 +1,6 @@
 package xdman.ui.components;
 
-import javax.swing.*;
+import javax.swing.JScrollBar;
 
 public class DarkScrollBar extends JScrollBar {
 	private static final long serialVersionUID = 8188065507500343252L;

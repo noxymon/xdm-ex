@@ -1,22 +1,30 @@
 package xdman.util;
 
-import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.WinReg;
-import xdman.Config;
-import xdman.Main;
-import xdman.XDMConstants;
-import xdman.downloaders.metadata.HttpMetadata;
-
-import java.awt.*;
+import java.awt.Desktop;
+import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.io.InputStreamReader;
+
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg;
+
+import xdman.Config;
+import xdman.Main;
+import xdman.XDMConstants;
+import xdman.downloaders.metadata.HttpMetadata;
 
 public class XDMUtils {
 	//private static float dpiScale;
@@ -46,21 +54,22 @@ public class XDMUtils {
 			'>', ':', '|' };
 
 	public static String decodeFileName(String str) {
-		String decoded = str;
-		try {
-			decoded = java.net.URLDecoder.decode(str, java.nio.charset.StandardCharsets.UTF_8);
-		} catch (Exception e) {
-			// fall through to existing behavior
-		}
-		// Strip invalid filename characters
-		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < decoded.length(); i++) {
-			char c = decoded.charAt(i);
-			if (c == '/' || c == '\\' || c == '"' || c == '?' || c == '*'
-					|| c == '<' || c == '>' || c == ':') {
+		char ch[] = str.toCharArray();
+		StringBuffer buf = new StringBuffer();
+		for (int i = 0; i < ch.length; i++) {
+			if (ch[i] == '/' || ch[i] == '\\' || ch[i] == '"' || ch[i] == '?'
+					|| ch[i] == '*' || ch[i] == '<' || ch[i] == '>'
+					|| ch[i] == ':')
 				continue;
+			if (ch[i] == '%') {
+				if (i + 2 < ch.length) {
+					int c = Integer.parseInt(ch[i + 1] + "" + ch[i + 2], 16);
+					buf.append((char) c);
+					i += 2;
+					continue;
+				}
 			}
-			buf.append(c);
+			buf.append(ch[i]);
 		}
 		return buf.toString();
 	}

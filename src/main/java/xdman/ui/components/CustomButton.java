@@ -1,9 +1,9 @@
 package xdman.ui.components;
 
+import java.awt.Color;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import com.formdev.flatlaf.FlatClientProperties;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class CustomButton extends JButton {
 	private static final long serialVersionUID = 6378409011977437191L;

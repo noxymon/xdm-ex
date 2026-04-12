@@ -1,6 +1,11 @@
 package xdman.util;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 
 public class LinuxUtils {
 	static String shutdownCmds[] = {

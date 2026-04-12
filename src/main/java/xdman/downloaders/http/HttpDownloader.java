@@ -5,7 +5,11 @@ import xdman.downloaders.AbstractChannel;
 import xdman.downloaders.Segment;
 import xdman.downloaders.SegmentDownloader;
 import xdman.downloaders.metadata.HttpMetadata;
-import xdman.util.*;
+import xdman.util.Logger;
+import xdman.util.MimeUtil;
+import xdman.util.NetUtils;
+import xdman.util.StringUtils;
+import xdman.util.XDMUtils;
 
 public class HttpDownloader extends SegmentDownloader {
 	private HttpMetadata metadata;
@@ -17,53 +21,12 @@ public class HttpDownloader extends SegmentDownloader {
 		this.metadata = metadata;
 	}
 
-	private static boolean isSignedUrl(String url) {
-		if (url == null) return false;
-		int queryIndex = url.indexOf('?');
-		if (queryIndex < 0) return false;
-		String query = url.substring(queryIndex + 1).toLowerCase();
-		return query.contains("x-amz-signature") || query.contains("x-amz-expires")
-				|| query.contains("signature=") || query.contains("token=");
-	}
-
 	@Override
 	public AbstractChannel createChannel(Segment segment) {
 		StringBuffer buf = new StringBuffer();
 		metadata.getHeaders().appendToBuffer(buf);
 		System.out.println("Headers all: " + buf);
-
-		String urlToUse = metadata.getUrl();
-		// Use cached resolved URL for signed URLs within expiry window
-		if (isSignedUrl(urlToUse)) {
-			String resolvedUrl = metadata.getResolvedUrl();
-			long resolvedTs = metadata.getResolvedUrlTimestamp();
-			if (resolvedUrl != null && resolvedTs > 0) {
-				// Default expiry window: 5 minutes
-				long expiryMs = 5 * 60 * 1000L;
-				// Try to extract X-Amz-Expires from the resolved URL query
-				try {
-					int queryIdx = resolvedUrl.indexOf('?');
-					if (queryIdx >= 0) {
-						for (String param : resolvedUrl.substring(queryIdx + 1).split("&")) {
-							if (param.toLowerCase().startsWith("x-amz-expires=")) {
-								expiryMs = Long.parseLong(param.substring(param.indexOf('=') + 1)) * 1000L;
-								break;
-							}
-						}
-					}
-				} catch (Exception ignored) {}
-				if (System.currentTimeMillis() - resolvedTs < expiryMs) {
-					urlToUse = resolvedUrl;
-					Logger.log("Using cached resolved URL for signed URL");
-				} else {
-					Logger.log("Cached resolved URL expired, re-resolving");
-					metadata.setResolvedUrl(null);
-					metadata.setResolvedUrlTimestamp(0);
-				}
-			}
-		}
-
-		HttpChannel hc = new HttpChannel(segment, urlToUse, metadata.getHeaders(), length,
+		HttpChannel hc = new HttpChannel(segment, metadata.getUrl(), metadata.getHeaders(), length,
 				isJavaClientRequired);
 		return hc;
 	}

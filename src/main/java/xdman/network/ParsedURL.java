@@ -1,9 +1,8 @@
 package xdman.network;
 
-import xdman.util.StringUtils;
+import java.net.*;
 
-import java.net.URI;
-import java.net.URL;
+import xdman.util.StringUtils;
 
 public class ParsedURL {
 	private String _url;

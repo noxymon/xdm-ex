@@ -1,13 +1,15 @@
 package xdman.ui.res;
 
-import com.formdev.flatlaf.extras.FlatSVGIcon;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 public class ImageResource {
 //	private final static String ICON_FOLDER = "icons";

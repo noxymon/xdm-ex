@@ -1,5 +1,26 @@
 package xdman.ui.components;
 
+import static xdman.util.XDMUtils.getScaledInt;
+
+import java.awt.EventQueue;
+import java.awt.Insets;
+import java.awt.Taskbar;
+import java.awt.Taskbar.Feature;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import xdman.DownloadEntry;
 import xdman.DownloadWindowListener;
 import xdman.XDMApp;
@@ -11,15 +32,6 @@ import xdman.ui.res.FontResource;
 import xdman.ui.res.ImageResource;
 import xdman.ui.res.StringResource;
 import xdman.util.FormatUtilities;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.Taskbar.Feature;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
-import static xdman.util.XDMUtils.getScaledInt;
 
 public class DownloadWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -5523541940635914890L;

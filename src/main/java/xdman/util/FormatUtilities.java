@@ -1,13 +1,10 @@
 package xdman.util;
 
-import xdman.DownloadEntry;
-import xdman.DownloadQueue;
-import xdman.QueueManager;
-import xdman.XDMConstants;
-import xdman.ui.res.StringResource;
+import java.text.*;
+import java.util.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import xdman.*;
+import xdman.ui.res.StringResource;
 
 public class FormatUtilities {
 	private static SimpleDateFormat _format;

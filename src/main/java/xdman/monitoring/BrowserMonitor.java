@@ -1,11 +1,5 @@
 package xdman.monitoring;
 
-import xdman.Config;
-import xdman.XDMApp;
-import xdman.ui.components.VideoPopupItem;
-import xdman.util.Base64;
-import xdman.util.Logger;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -20,6 +14,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+
+import xdman.Config;
+import xdman.XDMApp;
+import xdman.ui.components.VideoPopupItem;
+import xdman.util.Base64;
+import xdman.util.Logger;
 
 public class BrowserMonitor implements Runnable {
 	private static BrowserMonitor _this;

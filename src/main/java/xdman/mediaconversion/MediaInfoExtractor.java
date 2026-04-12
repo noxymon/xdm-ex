@@ -1,10 +1,5 @@
 package xdman.mediaconversion;
 
-import xdman.Config;
-import xdman.util.Logger;
-import xdman.util.XDMUtils;
-
-import javax.swing.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -12,6 +7,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.ImageIcon;
+
+import xdman.Config;
+import xdman.util.Logger;
+import xdman.util.XDMUtils;
 
 public class MediaInfoExtractor {
 	Pattern pattern1, pattern2;

@@ -1,16 +1,21 @@
 package xdman.videoparser;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
 import xdman.network.http.HttpHeader;
 import xdman.util.FormatUtilities;
 import xdman.util.Logger;
 import xdman.util.StringUtils;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
 
 public class YdlResponse {
 	public static final int DASH_HTTP = 99, HTTP = 98, HLS = 97, HDS = 96;

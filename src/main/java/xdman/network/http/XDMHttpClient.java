@@ -1,14 +1,15 @@
 package xdman.network.http;
 
-import xdman.network.*;
-import xdman.util.Logger;
-import xdman.util.NetUtils;
-import xdman.util.StringUtils;
+import java.io.*;
+import java.net.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import xdman.network.FixedRangeInputStream;
+import xdman.network.HostUnreachableException;
+import xdman.network.KeepAliveConnectionCache;
+import xdman.network.NetworkException;
+import xdman.network.ParsedURL;
+import xdman.network.SocketFactory;
+import xdman.util.*;
 
 public class XDMHttpClient extends HttpClient {
 	private ParsedURL _url;
@@ -103,13 +104,7 @@ public class XDMHttpClient extends HttpClient {
 			StringBuffer b2 = new StringBuffer();
 			responseHeaders.appendToBuffer(b2);
 			Logger.log(b2);
-
-			// If chunked transfer encoding is active, content-length is meaningless
-			String transferEncoding = responseHeaders.getValue("transfer-encoding");
-			if (transferEncoding != null && transferEncoding.contains("chunked")) {
-				length = -1;
-			}
-
+			
 			in = new FixedRangeInputStream(NetUtils.getInputStream(responseHeaders, socket.getInputStream()), length);
 
 			if (reusing) {

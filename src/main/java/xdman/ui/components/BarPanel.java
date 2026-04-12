@@ -1,7 +1,7 @@
 package xdman.ui.components;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class BarPanel extends JPanel {
 	private static final long serialVersionUID = -5396480713429517585L;

@@ -1,9 +1,9 @@
 package xdman.network.http;
 
-import xdman.network.ICredentialManager;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import xdman.network.ICredentialManager;
 
 public abstract class HttpClient {
 	protected HeaderCollection requestHeaders;

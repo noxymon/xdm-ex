@@ -1,6 +1,7 @@
 package xdman.ui.res;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JButton;
 
 public class CustomButton extends JButton {
 	private static final long serialVersionUID = 6378409011977437191L;

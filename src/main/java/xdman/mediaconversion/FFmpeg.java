@@ -1,10 +1,5 @@
 package xdman.mediaconversion;
 
-import xdman.Config;
-import xdman.util.Logger;
-import xdman.util.StringUtils;
-import xdman.util.XDMUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import xdman.Config;
+import xdman.util.Logger;
+import xdman.util.StringUtils;
+import xdman.util.XDMUtils;
+
 public class FFmpeg {
 	public final static int FF_NOT_FOUND = 10, FF_LAUNCH_ERROR = 20, FF_CONVERSION_FAILED = 30, FF_SUCCESS = 0;
+	private static final int MAX_OUTPUT_SIZE = 64 * 1024;
 	private MediaFormat outformat;
 	private MediaConversionListener listener;
 	private boolean copy;
@@ -27,6 +28,7 @@ public class FFmpeg {
 	//private String preset = "ultrafast";
 	private String volume;
 	private boolean useHwAccel;
+	private StringBuilder lastOutput = new StringBuilder();
 
 	public FFmpeg(List<String> inputFiles, String outputFile, MediaConversionListener listener, MediaFormat outformat,
 			boolean copy) {
@@ -194,6 +196,9 @@ public class FFmpeg {
 			}
 
 			ffExitCode = proc.waitFor();
+			if (ffExitCode != 0) {
+				Logger.log("FFmpeg failed with exit code " + ffExitCode + ". Output:\n" + lastOutput.toString());
+			}
 			return ffExitCode == 0 ? FF_SUCCESS : FF_CONVERSION_FAILED;
 		} catch (RuntimeException | InterruptedException | IOException e) {
 			return FF_LAUNCH_ERROR;
@@ -226,9 +231,17 @@ public class FFmpeg {
 		return duration;
 	}
 
+	public String getLastOutput() {
+		return lastOutput.toString();
+	}
+
 	private void processOutput(String text) {
 		if (StringUtils.isNullOrEmpty(text)) {
 			return;
+		}
+		Logger.log("ffmpeg> " + text);
+		if (lastOutput.length() < MAX_OUTPUT_SIZE) {
+			lastOutput.append(text).append("\n");
 		}
 		if (totalDuration > 0) {
 			if (text.startsWith("frame=") && text.contains("time=")) {

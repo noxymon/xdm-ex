@@ -1,13 +1,10 @@
 package xdman.network.http;
 
-import xdman.network.ProxyResolver;
-
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import xdman.network.ProxyResolver;
 
 public class JavaHttpClient extends HttpClient {
 	private HttpURLConnection hc;
