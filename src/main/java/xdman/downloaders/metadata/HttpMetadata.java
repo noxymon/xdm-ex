@@ -14,6 +14,8 @@ public class HttpMetadata {
 	protected HeaderCollection headers;
 	private long size;
 	private String ydlUrl;
+	private String resolvedUrl;
+	private long resolvedUrlTimestamp;
 
 	public HttpMetadata derive() {
 		Logger.log("derive normal metadata");
@@ -199,6 +201,16 @@ public class HttpMetadata {
 					Logger.log("ydurl: " + val);
 					metadata.ydlUrl = val;
 				}
+				if (key.equals("resolvedurl")) {
+					metadata.resolvedUrl = val;
+				}
+				if (key.equals("resolvedurlTimestamp") || key.equals("resolvedurltimestamp")) {
+					try {
+						metadata.resolvedUrlTimestamp = Long.parseLong(val);
+					} catch (NumberFormatException e) {
+						// ignore
+					}
+				}
 			}
 			br.close();
 		} catch (Exception e) {
@@ -248,7 +260,11 @@ public class HttpMetadata {
 
 			}
 			if (!StringUtils.isNullOrEmptyOrBlank(ydlUrl)) {
-				sb.append("ydlUrl: " + ydlUrl);
+				sb.append("ydlUrl: " + ydlUrl + "\n");
+			}
+			if (!StringUtils.isNullOrEmptyOrBlank(resolvedUrl)) {
+				sb.append("resolvedUrl: " + resolvedUrl + "\n");
+				sb.append("resolvedUrlTimestamp: " + resolvedUrlTimestamp + "\n");
 			}
 
 			File metadataFolder = new File(Config.getInstance().getMetadataFolder());
@@ -284,5 +300,21 @@ public class HttpMetadata {
 
 	public void setYdlUrl(String ydlUrl) {
 		this.ydlUrl = ydlUrl;
+	}
+
+	public String getResolvedUrl() {
+		return resolvedUrl;
+	}
+
+	public void setResolvedUrl(String resolvedUrl) {
+		this.resolvedUrl = resolvedUrl;
+	}
+
+	public long getResolvedUrlTimestamp() {
+		return resolvedUrlTimestamp;
+	}
+
+	public void setResolvedUrlTimestamp(long resolvedUrlTimestamp) {
+		this.resolvedUrlTimestamp = resolvedUrlTimestamp;
 	}
 }

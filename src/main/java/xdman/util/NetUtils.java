@@ -1,6 +1,10 @@
 package xdman.util;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 import xdman.network.http.*;
@@ -103,11 +107,30 @@ public class NetUtils {
 		try {
 			String arr[] = header.split(";");
 			for (String str : arr) {
-				if (str.contains("filename*")) {
-					int index = str.lastIndexOf("'");
-					if (index > 0) {
-						String st = str.substring(index + 1);
-						return XDMUtils.decodeFileName(st);
+				str = str.trim();
+				if (str.toLowerCase().startsWith("filename*")) {
+					int eqIdx = str.indexOf('=');
+					if (eqIdx < 0) continue;
+					String rfc5987 = str.substring(eqIdx + 1).trim();
+					// Format: charset'language'encoded-value
+					int firstQuote = rfc5987.indexOf('\'');
+					int secondQuote = firstQuote >= 0 ? rfc5987.indexOf('\'', firstQuote + 1) : -1;
+					if (firstQuote >= 0 && secondQuote > firstQuote) {
+						String charset = rfc5987.substring(0, firstQuote).trim();
+						String encodedValue = rfc5987.substring(secondQuote + 1);
+						if (charset.isEmpty()) charset = "UTF-8";
+						try {
+							return URLDecoder.decode(encodedValue, charset);
+						} catch (Exception e) {
+							return URLDecoder.decode(encodedValue, StandardCharsets.UTF_8);
+						}
+					} else {
+						// Fallback: no charset/language prefix, try last quote approach
+						int index = rfc5987.lastIndexOf("'");
+						if (index >= 0) {
+							String st = rfc5987.substring(index + 1);
+							return XDMUtils.decodeFileName(st);
+						}
 					}
 				}
 			}
@@ -135,7 +158,23 @@ public class NetUtils {
 						String file = str.substring(index + 1).replace("\"", "")
 								.trim();
 						try {
-							return XDMUtils.decodeFileName(file);
+							String decoded = XDMUtils.decodeFileName(file);
+							// Heuristic: try UTF-8 re-decode of ISO-8859-1 interpreted string
+							try {
+								byte[] isoBytes = decoded.getBytes(StandardCharsets.ISO_8859_1);
+								// Validate that isoBytes is actually valid UTF-8 before re-interpreting.
+								// Must decode isoBytes directly — not a re-encoded Java String —
+								// so that CodingErrorAction.REPORT can detect invalid sequences.
+								StandardCharsets.UTF_8.newDecoder()
+									.onMalformedInput(CodingErrorAction.REPORT)
+									.onUnmappableCharacter(CodingErrorAction.REPORT)
+									.decode(ByteBuffer.wrap(isoBytes));
+								// isoBytes is valid UTF-8 — apply the re-interpretation
+								decoded = new String(isoBytes, StandardCharsets.UTF_8);
+							} catch (Exception e) {
+								// Not valid UTF-8 — keep original decoded value
+							}
+							return decoded;
 						} catch (Exception e) {
 							return file;
 						}

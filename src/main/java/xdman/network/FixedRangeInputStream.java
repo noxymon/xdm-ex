@@ -46,7 +46,7 @@ public class FixedRangeInputStream extends InputStream {
 				return -1;
 		}
 		if (rem > 0) {
-			rem -= x;
+			rem -= 1; // single-byte read: x is the byte value (0-255), not count
 		}
 		return x;
 	}

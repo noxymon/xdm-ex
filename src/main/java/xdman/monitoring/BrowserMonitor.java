@@ -14,6 +14,13 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.OptionalLong;
+
+import xdman.Config;
+import xdman.XDMApp;
+import xdman.ui.components.VideoPopupItem;
+import xdman.util.Base64;
+import xdman.util.Logger;
 
 import xdman.Config;
 import xdman.XDMApp;
@@ -179,9 +186,44 @@ public class BrowserMonitor implements Runnable {
 		return sb.toString();
 	}
 
+	private void handlePidFile() {
+		try {
+			Path pidFile = Paths.get(System.getProperty("user.home"), ".xdman", "xdm.pid");
+			if (Files.exists(pidFile)) {
+				try {
+					String content = Files.readString(pidFile).trim();
+					long existingPid = Long.parseLong(content);
+					boolean alive = ProcessHandle.of(existingPid)
+							.map(ProcessHandle::isAlive)
+							.orElse(false);
+					if (!alive) {
+						Logger.log("Stale PID file found (pid=" + existingPid + "), removing");
+						Files.deleteIfExists(pidFile);
+					}
+				} catch (Exception e) {
+					Files.deleteIfExists(pidFile);
+				}
+			}
+			// Write current PID
+			long currentPid = ProcessHandle.current().pid();
+			Files.writeString(pidFile, String.valueOf(currentPid));
+			// Register shutdown hook to clean up PID file
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				try {
+					Files.deleteIfExists(pidFile);
+				} catch (Exception ex) {
+					// ignore
+				}
+			}));
+		} catch (Exception e) {
+			Logger.log("PID file handling failed: " + e.getMessage());
+		}
+	}
+
 	public void run() {
 		ServerSocket serverSock = null;
 		try {
+			handlePidFile();
 			serverSock = new ServerSocket();
 			serverSock.bind(new InetSocketAddress(InetAddress.getLoopbackAddress(), 9614));
 			XDMApp.instanceStarted();

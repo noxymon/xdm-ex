@@ -14,9 +14,34 @@ public class FontResource {
 	private static final String FALLBACK_FONT = "Segoe UI Variable Text";
 
 	private static Font createFont(int style, int size) {
-		Font font = new Font(MODERN_FONT, style, XDMUtils.getScaledInt(size));
+		int scaledSize = XDMUtils.getScaledInt(size);
+		Font font = new Font(MODERN_FONT, style, scaledSize);
 		if (font.getFamily().equalsIgnoreCase("Dialog") || font.getFamily().equalsIgnoreCase("SansSerif")) {
-			font = new Font(FALLBACK_FONT, style, XDMUtils.getScaledInt(size));
+			font = new Font(FALLBACK_FONT, style, scaledSize);
+		}
+		// CJK/extended-Latin fallback check
+		if (font.canDisplayUpTo("\u4e2d\u6587") >= 0) {
+			String osName = System.getProperty("os.name", "").toLowerCase();
+			String[] candidates;
+			if (osName.contains("windows")) {
+				candidates = new String[]{"Microsoft YaHei", "SimHei"};
+			} else if (osName.contains("linux")) {
+				candidates = new String[]{"Noto Sans CJK SC", "WenQuanYi Micro Hei"};
+			} else {
+				candidates = new String[0];
+			}
+			boolean found = false;
+			for (String candidate : candidates) {
+				Font candidateFont = new Font(candidate, style, scaledSize);
+				if (!candidateFont.getFamily().equalsIgnoreCase("Dialog") && candidateFont.canDisplayUpTo("\u4e2d\u6587") < 0) {
+					font = candidateFont;
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				font = new Font(Font.SANS_SERIF, style, scaledSize);
+			}
 		}
 		return font;
 	}
