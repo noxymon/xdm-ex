@@ -102,17 +102,28 @@ public class LinuxUtils {
 	}
 
 	private static String getDesktopFileString() {
-		String str = "[Desktop Entry]\r\n" + "Encoding=UTF-8\r\n" + "Version=1.0\r\n" + "Type=Application\r\n"
-				+ "Terminal=false\r\n" + "Exec=\"%sbin/java\" -Xmx1024m -jar \"%s\" -m\r\n" + "Name=Xtreme Download Manager\r\n"
-				+ "Comment=Xtreme Download Manager\r\n" + "Categories=Network;\r\n" + "Icon=/opt/xdman/icon.png";
+		String str = "[Desktop Entry]\n"
+				+ "Encoding=UTF-8\n"
+				+ "Version=1.0\n"
+				+ "Type=Application\n"
+				+ "Terminal=false\n"
+				+ "StartupNotify=false\n"
+				+ "X-GNOME-Autostart-enabled=true\n"
+				+ "Exec=\"%sbin/java\" -Xmx1024m -jar \"%s\" -m\n"
+				+ "Name=Xtreme Download Manager\n"
+				+ "Comment=Xtreme Download Manager\n"
+				+ "Categories=Network;\n"
+				+ "Icon=/opt/xdman/icon.png";
 		String s1 = getProperPath(System.getProperty("java.home"));
 		String s2 = XDMUtils.getJarFile().getAbsolutePath();
 		return String.format(str, s1, s2);
 	}
 
 	private static String getProperPath(String path) {
-		if (path.endsWith("/"))
+		// Ensure trailing slash, stripping any existing trailing slash first
+		if (path.endsWith("/")) {
 			return path;
+		}
 		return path + "/";
 	}
 	

@@ -21,13 +21,31 @@ public class HttpDownloader extends SegmentDownloader {
 		this.metadata = metadata;
 	}
 
+	private static final long SIGNED_URL_CACHE_TTL = 5 * 60 * 1000L; // 5 minutes
+
+	static boolean isSignedUrl(String url) {
+		if (url == null) return false;
+		return url.contains("X-Amz-Signature") || url.contains("X-Amz-Expires")
+				|| url.contains("Signature=") || url.contains("token=");
+	}
+
 	@Override
 	public AbstractChannel createChannel(Segment segment) {
 		StringBuffer buf = new StringBuffer();
 		metadata.getHeaders().appendToBuffer(buf);
 		System.out.println("Headers all: " + buf);
-		HttpChannel hc = new HttpChannel(segment, metadata.getUrl(), metadata.getHeaders(), length,
-				isJavaClientRequired);
+		String urlToUse = metadata.getUrl();
+		// If signed URL, check if we have a cached resolved URL that is still valid
+		if (isSignedUrl(urlToUse)) {
+			String cachedUrl = metadata.getResolvedUrl();
+			long cachedTimestamp = metadata.getResolvedUrlTimestamp();
+			if (cachedUrl != null && (System.currentTimeMillis() - cachedTimestamp) < SIGNED_URL_CACHE_TTL) {
+				Logger.log("Using cached resolved URL for signed URL");
+				urlToUse = cachedUrl;
+			}
+		}
+		HttpChannel hc = new HttpChannel(segment, urlToUse, metadata.getHeaders(), length,
+				isJavaClientRequired, metadata);
 		return hc;
 	}
 

@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -54,22 +56,24 @@ public class XDMUtils {
 			'>', ':', '|' };
 
 	public static String decodeFileName(String str) {
-		char ch[] = str.toCharArray();
+		String decoded;
+		try {
+			// Pre-escape literal '+' so URLDecoder does not convert them to spaces
+			// (URLDecoder follows application/x-www-form-urlencoded semantics where '+' means space)
+			String safe = str.replace("+", "%2B");
+			decoded = URLDecoder.decode(safe, StandardCharsets.UTF_8);
+		} catch (Exception e) {
+			decoded = str;
+		}
+		// Strip invalid filename characters
+		char[] ch = decoded.toCharArray();
 		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < ch.length; i++) {
-			if (ch[i] == '/' || ch[i] == '\\' || ch[i] == '"' || ch[i] == '?'
-					|| ch[i] == '*' || ch[i] == '<' || ch[i] == '>'
-					|| ch[i] == ':')
+		for (char c : ch) {
+			if (c == '/' || c == '\\' || c == '"' || c == '?'
+					|| c == '*' || c == '<' || c == '>'
+					|| c == ':')
 				continue;
-			if (ch[i] == '%') {
-				if (i + 2 < ch.length) {
-					int c = Integer.parseInt(ch[i + 1] + "" + ch[i + 2], 16);
-					buf.append((char) c);
-					i += 2;
-					continue;
-				}
-			}
-			buf.append(ch[i]);
+			buf.append(c);
 		}
 		return buf.toString();
 	}

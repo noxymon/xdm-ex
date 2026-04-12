@@ -8,9 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -226,11 +223,6 @@ public class DashDownloader extends Downloader implements MediaConversionListene
 		XDMUtils.mkdirs(getOutputFolder());
 		try {
 			assembleFinished = false;
-			// Ensure output filename has an extension
-			String outputFileName = getOutputFileName(true);
-			if (XDMUtils.getExtension(outputFileName) == null || XDMUtils.getExtension(outputFileName).isEmpty()) {
-				outputFileName = outputFileName + ".mkv";
-			}
 			ArrayList<Segment> list1 = new ArrayList<>();
 			ArrayList<Segment> list2 = new ArrayList<>();
 			for (Segment sc : chunks) {
@@ -255,8 +247,7 @@ public class DashDownloader extends Downloader implements MediaConversionListene
 			inputFiles.add(tf2.getAbsolutePath());
 
 			this.converting = true;
-			// Use UUID-only temp filename to avoid non-ASCII path issues on Windows
-			outFile = new File(getOutputFolder(), UUID.randomUUID().toString() + ".tmp");
+			outFile = new File(getOutputFolder(), UUID.randomUUID() + "_" + getOutputFileName(true));
 
 			this.ffmpeg = new FFmpeg(inputFiles, outFile.getAbsolutePath(), this,
 					MediaFormats.getSupportedFormats()[outputFormat], outputFormat == 0);
@@ -264,7 +255,7 @@ public class DashDownloader extends Downloader implements MediaConversionListene
 			Logger.log("FFmpeg exit code: " + ret);
 
 			if (ret != 0) {
-				throw new IOException("FFmpeg failed: " + ffmpeg.getLastOutput());
+				throw new IOException("FFmpeg failed");
 			} else {
 				long length = outFile.length();
 				if (length > 0) {
@@ -274,7 +265,7 @@ public class DashDownloader extends Downloader implements MediaConversionListene
 			}
 
 			// delete the original file if exists and rename the temp file to original
-			File realFile = new File(getOutputFolder(), outputFileName);
+			File realFile = new File(getOutputFolder(), getOutputFileName(true));
 			if (realFile.exists()) {
 				realFile.delete();
 			}
@@ -574,13 +565,8 @@ public class DashDownloader extends Downloader implements MediaConversionListene
 			FileOutputStream fs = new FileOutputStream(tmp);
 			fs.write(sb.toString().getBytes());
 			fs.close();
-			try {
-				Files.move(tmp.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING,
-						StandardCopyOption.ATOMIC_MOVE);
-			} catch (AtomicMoveNotSupportedException e) {
-				out.delete();
-				tmp.renameTo(out);
-			}
+			out.delete();
+			tmp.renameTo(out);
 		} catch (Exception e) {
 			Logger.log(e);
 		}

@@ -101,10 +101,15 @@ public class XDMHttpClient extends HttpClient {
 
 			responseHeaders.loadFromStream(sockIn);
 			length = NetUtils.getContentLength(responseHeaders);
+			// If Transfer-Encoding: chunked, content-length is meaningless
+			String transferEncoding = responseHeaders.getValue("transfer-encoding");
+			if (transferEncoding != null && transferEncoding.toLowerCase().contains("chunked")) {
+				length = -1;
+			}
 			StringBuffer b2 = new StringBuffer();
 			responseHeaders.appendToBuffer(b2);
 			Logger.log(b2);
-			
+
 			in = new FixedRangeInputStream(NetUtils.getInputStream(responseHeaders, socket.getInputStream()), length);
 
 			if (reusing) {

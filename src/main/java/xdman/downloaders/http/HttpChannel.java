@@ -12,6 +12,7 @@ import java.util.Locale;
 import xdman.XDMConstants;
 import xdman.downloaders.AbstractChannel;
 import xdman.downloaders.Segment;
+import xdman.downloaders.metadata.HttpMetadata;
 import xdman.network.ProxyResolver;
 import xdman.network.http.HeaderCollection;
 import xdman.network.http.HttpClient;
@@ -33,6 +34,7 @@ public class HttpChannel extends AbstractChannel {
 	protected long totalLength;
 	protected boolean redirected;
 	protected String redirectUrl;
+	protected HttpMetadata metadata;
 
 	public HttpChannel(Segment chunk, String url, HeaderCollection headers, long totalLength,
 			// it may be known from first connection
@@ -45,10 +47,18 @@ public class HttpChannel extends AbstractChannel {
 		this.javaClientRequired = javaClientRequired;
 	}
 
+	public HttpChannel(Segment chunk, String url, HeaderCollection headers, long totalLength,
+			boolean javaClientRequired, HttpMetadata metadata) {
+		this(chunk, url, headers, totalLength, javaClientRequired);
+		this.metadata = metadata;
+	}
+
 	@Override
 	protected boolean connectImpl() {
 		int sleepInterval = 0;
 		boolean isRedirect = false;
+		int redirectCount = 0;
+		final int MAX_REDIRECTS = 5;
 		if (stop) {
 			closeImpl();
 			return false;
@@ -141,25 +151,25 @@ public class HttpChannel extends AbstractChannel {
 
 				if (code >= 300 && code < 400) {
 					closeImpl();
-					if (totalLength > 0) {
+					if (redirectCount >= MAX_REDIRECTS) {
 						errorCode = XDMConstants.ERR_INVALID_RESP;
-						Logger.log(chunk + " Redirecting twice");
+						Logger.log(chunk + " Too many redirects (max " + MAX_REDIRECTS + ")");
 						return false;
-					} else {
-						url = hc.getResponseHeader("location");
-						Logger.log(chunk + " location: " + url);
-						if (!url.startsWith("http")) {
-							if (!url.startsWith("/")) {
-								url = "/" + url;
-							}
-							url = "http://" + hc.getHost() + url;
-						}
-						url = url.replace(" ", "%20");
-						isRedirect = true;
-						redirected = true;
-						redirectUrl = url;
-						throw new Exception("Redirecting to: " + url);
 					}
+					redirectCount++;
+					url = hc.getResponseHeader("location");
+					Logger.log(chunk + " location: " + url);
+					if (!url.startsWith("http")) {
+						if (!url.startsWith("/")) {
+							url = "/" + url;
+						}
+						url = "http://" + hc.getHost() + url;
+					}
+					url = url.replace(" ", "%20");
+					isRedirect = true;
+					redirected = true;
+					redirectUrl = url;
+					throw new Exception("Redirecting to: " + url);
 				}
 
 				if (code != 200 && code != 206 && code != 416 && code != 413 && code != 401 && code != 408
@@ -252,6 +262,13 @@ public class HttpChannel extends AbstractChannel {
 				}
 
 				in = hc.getInputStream();
+				// Only cache the resolved URL if it is stable (not itself a signed URL).
+				// Storing a signed redirect target would poison the cache with a URL
+				// that may expire sooner than the original signed URL's TTL.
+				if (metadata != null && !HttpDownloader.isSignedUrl(url)) {
+					metadata.setResolvedUrl(url);
+					metadata.setResolvedUrlTimestamp(System.currentTimeMillis());
+				}
 				Logger.log("Connection success");
 				return true;
 
