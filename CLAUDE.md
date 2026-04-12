@@ -8,11 +8,10 @@ Xtreme Download Manager (XDM) — a Java Swing desktop download manager that acc
 
 ## Build Commands
 
-The project uses Maven with a wrapper. All commands run from the `app/` directory:
+The project uses Maven with a wrapper. All commands run from the root directory:
 
 ```bash
-cd app
-./mvnw clean install          # Build fat JAR (app/target/xdman.jar)
+./mvnw clean install          # Build fat JAR (target/xdman.jar)
 ./mvnw clean package           # Package without running tests
 ./mvnw test                    # Tests are skipped by default (surefire skipTests=true)
 java -jar target/xdman.jar     # Run the application
@@ -43,13 +42,13 @@ java -jar target/xdman.jar     # Run the application
 
 ### Browser Extensions
 
-Located in `app/extensions/`:
+Located in `extensions/`:
 - `xdm-browser-monitor/` — Chrome/Firefox extension that intercepts downloads
 - `native-messaging/` — Native messaging host for browser-to-app communication
 
 ### Translations
 
-Translation files in `app/translations/` (e.g., `en.txt`, `de.txt`). Loaded by `StringResource`.
+Translation files in `src/main/resources/lang/` (e.g., `en.txt`, `de.txt`). Loaded by `StringResource`.
 
 ### Configuration
 
