@@ -46,7 +46,7 @@ public class FixedRangeInputStream extends InputStream {
 				return -1;
 		}
 		if (rem > 0) {
-			rem -= 1;
+			rem -= x;
 		}
 		return x;
 	}

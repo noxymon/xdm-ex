@@ -1,18 +1,12 @@
 package xdman.downloaders.metadata;
 
-import xdman.Config;
-import xdman.XDMConstants;
-import xdman.network.http.HeaderCollection;
-import xdman.network.http.HttpHeader;
-import xdman.util.Logger;
-import xdman.util.StringUtils;
+import java.io.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
+
+import xdman.*;
+import xdman.network.http.*;
+import xdman.util.*;
 
 public class HttpMetadata {
 	protected String id;
@@ -20,8 +14,6 @@ public class HttpMetadata {
 	protected HeaderCollection headers;
 	private long size;
 	private String ydlUrl;
-	private String resolvedUrl;
-	private long resolvedUrlTimestamp;
 
 	public HttpMetadata derive() {
 		Logger.log("derive normal metadata");
@@ -207,12 +199,6 @@ public class HttpMetadata {
 					Logger.log("ydurl: " + val);
 					metadata.ydlUrl = val;
 				}
-				if (key.equals("resolvedurl")) {
-					metadata.resolvedUrl = val;
-				}
-				if (key.equals("resolvedurlts")) {
-					metadata.resolvedUrlTimestamp = Long.parseLong(val);
-				}
 			}
 			br.close();
 		} catch (Exception e) {
@@ -262,11 +248,7 @@ public class HttpMetadata {
 
 			}
 			if (!StringUtils.isNullOrEmptyOrBlank(ydlUrl)) {
-				sb.append("ydlUrl: " + ydlUrl + "\n");
-			}
-			if (!StringUtils.isNullOrEmptyOrBlank(resolvedUrl)) {
-				sb.append("resolvedurl: " + resolvedUrl + "\n");
-				sb.append("resolvedurlts: " + resolvedUrlTimestamp + "\n");
+				sb.append("ydlUrl: " + ydlUrl);
 			}
 
 			File metadataFolder = new File(Config.getInstance().getMetadataFolder());
@@ -302,21 +284,5 @@ public class HttpMetadata {
 
 	public void setYdlUrl(String ydlUrl) {
 		this.ydlUrl = ydlUrl;
-	}
-
-	public String getResolvedUrl() {
-		return resolvedUrl;
-	}
-
-	public void setResolvedUrl(String resolvedUrl) {
-		this.resolvedUrl = resolvedUrl;
-	}
-
-	public long getResolvedUrlTimestamp() {
-		return resolvedUrlTimestamp;
-	}
-
-	public void setResolvedUrlTimestamp(long resolvedUrlTimestamp) {
-		this.resolvedUrlTimestamp = resolvedUrlTimestamp;
 	}
 }

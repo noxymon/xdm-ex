@@ -1,13 +1,5 @@
 package xdman.downloaders.http;
 
-import xdman.XDMConstants;
-import xdman.downloaders.AbstractChannel;
-import xdman.downloaders.Segment;
-import xdman.network.ProxyResolver;
-import xdman.network.http.*;
-import xdman.util.Logger;
-import xdman.util.XDMUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +8,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
+import xdman.XDMConstants;
+import xdman.downloaders.AbstractChannel;
+import xdman.downloaders.Segment;
+import xdman.network.ProxyResolver;
+import xdman.network.http.HeaderCollection;
+import xdman.network.http.HttpClient;
+import xdman.network.http.HttpHeader;
+import xdman.network.http.JavaClientRequiredException;
+import xdman.network.http.JavaHttpClient;
+import xdman.network.http.WebProxy;
+import xdman.network.http.XDMHttpClient;
+import xdman.util.Logger;
+import xdman.util.XDMUtils;
 
 public class HttpChannel extends AbstractChannel {
 	protected String url;
@@ -27,7 +33,6 @@ public class HttpChannel extends AbstractChannel {
 	protected long totalLength;
 	protected boolean redirected;
 	protected String redirectUrl;
-	protected String finalResolvedUrl;
 
 	public HttpChannel(Segment chunk, String url, HeaderCollection headers, long totalLength,
 			// it may be known from first connection
@@ -44,7 +49,6 @@ public class HttpChannel extends AbstractChannel {
 	protected boolean connectImpl() {
 		int sleepInterval = 0;
 		boolean isRedirect = false;
-		int redirectCount = 0;
 		if (stop) {
 			closeImpl();
 			return false;
@@ -137,25 +141,25 @@ public class HttpChannel extends AbstractChannel {
 
 				if (code >= 300 && code < 400) {
 					closeImpl();
-					redirectCount++;
-					if (redirectCount > 5) {
+					if (totalLength > 0) {
 						errorCode = XDMConstants.ERR_INVALID_RESP;
-						Logger.log(chunk + " Too many redirects (> 5)");
+						Logger.log(chunk + " Redirecting twice");
 						return false;
-					}
-					url = hc.getResponseHeader("location");
-					Logger.log(chunk + " location: " + url);
-					if (!url.startsWith("http")) {
-						if (!url.startsWith("/")) {
-							url = "/" + url;
+					} else {
+						url = hc.getResponseHeader("location");
+						Logger.log(chunk + " location: " + url);
+						if (!url.startsWith("http")) {
+							if (!url.startsWith("/")) {
+								url = "/" + url;
+							}
+							url = "http://" + hc.getHost() + url;
 						}
-						url = "http://" + hc.getHost() + url;
+						url = url.replace(" ", "%20");
+						isRedirect = true;
+						redirected = true;
+						redirectUrl = url;
+						throw new Exception("Redirecting to: " + url);
 					}
-					url = url.replace(" ", "%20");
-					isRedirect = true;
-					redirected = true;
-					redirectUrl = url;
-					throw new Exception("Redirecting to: " + url);
 				}
 
 				if (code != 200 && code != 206 && code != 416 && code != 413 && code != 401 && code != 408
@@ -248,7 +252,6 @@ public class HttpChannel extends AbstractChannel {
 				}
 
 				in = hc.getInputStream();
-				finalResolvedUrl = url;
 				Logger.log("Connection success");
 				return true;
 
@@ -314,10 +317,6 @@ public class HttpChannel extends AbstractChannel {
 
 	public String getRedirectUrl() {
 		return redirectUrl;
-	}
-
-	public String getFinalResolvedUrl() {
-		return finalResolvedUrl;
 	}
 
 	public String getHeader(String name) {

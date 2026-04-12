@@ -1,13 +1,13 @@
 package xdman.ui.res;
 
-import xdman.Config;
-import xdman.util.Logger;
-
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Properties;
+
+import xdman.Config;
+import xdman.util.Logger;
 
 public class StringResource {
 	private static Properties strings;

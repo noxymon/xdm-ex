@@ -1,6 +1,24 @@
 package xdman.ui.components;
 
+import static xdman.util.XDMUtils.getScaledInt;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+
 import com.formdev.flatlaf.FlatClientProperties;
+
 import xdman.downloaders.metadata.HttpMetadata;
 import xdman.ui.res.ColorResource;
 import xdman.ui.res.FontResource;
@@ -8,16 +26,6 @@ import xdman.ui.res.ImageResource;
 import xdman.ui.res.StringResource;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
-
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static xdman.util.XDMUtils.getScaledInt;
 
 public class ClipboardPasteWnd extends JFrame implements ActionListener {
 

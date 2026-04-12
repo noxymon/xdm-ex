@@ -1,5 +1,37 @@
 package xdman;
 
+import java.awt.EventQueue;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.PasswordAuthentication;
+import java.nio.charset.Charset;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import xdman.downloaders.Downloader;
 import xdman.downloaders.dash.DashDownloader;
 import xdman.downloaders.ftp.FtpDownloader;
@@ -12,19 +44,27 @@ import xdman.downloaders.metadata.HlsMetadata;
 import xdman.downloaders.metadata.HttpMetadata;
 import xdman.monitoring.BrowserMonitor;
 import xdman.network.http.HttpContext;
-import xdman.ui.components.*;
+import xdman.ui.components.BatchDownloadWnd;
+import xdman.ui.components.ComponentInstaller;
+import xdman.ui.components.DownloadCompleteWnd;
+import xdman.ui.components.DownloadWindow;
+import xdman.ui.components.MainWindow;
+import xdman.ui.components.NewDownloadWindow;
+import xdman.ui.components.TrayHandler;
+import xdman.ui.components.VideoDownloadWindow;
+import xdman.ui.components.VideoPopup;
+import xdman.ui.components.VideoPopupItem;
 import xdman.ui.res.StringResource;
-import xdman.util.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.net.PasswordAuthentication;
-import java.nio.charset.Charset;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
+import xdman.util.FFmpegDownloader;
+import xdman.util.LinuxUtils;
+import xdman.util.Logger;
+import xdman.util.MacUtils;
+import xdman.util.NativeMessagingHostInstaller;
+import xdman.util.ParamUtils;
+import xdman.util.StringUtils;
+import xdman.util.UpdateChecker;
+import xdman.util.WinUtils;
+import xdman.util.XDMUtils;
 
 public class XDMApp implements DownloadListener, DownloadWindowListener, Comparator<String> {
 	public static final String GLOBAL_LOCK_FILE = ".xdm-global-lock";
@@ -49,6 +89,7 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 	private long lastSaved;
 	private QueueManager qMgr;
 	private LinkRefreshCallback refreshCallback;
+	private ScheduledExecutorService autoSaveExecutor;
 
 	private ArrayList<String> pendingDownloads;// this buffer is used when there
 												// is a limit on maximum
@@ -213,6 +254,7 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 		downloaders = new HashMap<String, Downloader>();
 		downloadWindows = new HashMap<String, DownloadWindow>();
 		loadDownloadList();
+		recoverOrphanedDownloads();
 		lastSaved = System.currentTimeMillis();
 		pendingDownloads = new ArrayList<String>();
 		qMgr = QueueManager.getInstance();
@@ -222,9 +264,25 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 		if (Config.getInstance().isMonitorClipboard()) {
 			ClipboardMonitor.getInstance().startMonitoring();
 		}
+		// Start periodic auto-save every 30 seconds
+		autoSaveExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+			Thread t = new Thread(r, "XDM-AutoSave");
+			t.setDaemon(true);
+			return t;
+		});
+		autoSaveExecutor.scheduleAtFixedRate(() -> {
+			try {
+				saveDownloadList();
+			} catch (Exception e) {
+				Logger.log("Auto-save failed: " + e.getMessage());
+			}
+		}, 30, 30, TimeUnit.SECONDS);
 	}
 
 	public void exit() {
+		if (autoSaveExecutor != null) {
+			autoSaveExecutor.shutdown();
+		}
 		saveDownloadList();
 		qMgr.saveQueues();
 		Config.getInstance().save();
@@ -770,9 +828,75 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 		}
 	}
 
+	private void recoverOrphanedDownloads() {
+		try {
+			File tempFolder = new File(Config.getInstance().getTemporaryFolder());
+			if (!tempFolder.exists()) return;
+			File[] dirs = tempFolder.listFiles();
+			if (dirs == null) return;
+			for (File dir : dirs) {
+				if (!dir.isDirectory()) continue;
+				String dirName = dir.getName();
+				// Only consider UUID-named directories
+				try {
+					java.util.UUID.fromString(dirName);
+				} catch (IllegalArgumentException e) {
+					continue; // not a UUID directory
+				}
+				if (downloads.containsKey(dirName)) continue; // already tracked
+				// Look for state.txt to confirm this is a valid in-progress download dir
+				File stateFile = new File(dir, "state.txt");
+				if (!stateFile.exists()) continue;
+				// Try to resolve the original filename via the metadata file
+				String resolvedFileName = null;
+				try {
+					xdman.downloaders.metadata.HttpMetadata metadata =
+							xdman.downloaders.metadata.HttpMetadata.load(dirName);
+					if (metadata != null && metadata.getUrl() != null) {
+						String nameFromUrl = XDMUtils.getFileName(metadata.getUrl());
+						if (!StringUtils.isNullOrEmptyOrBlank(nameFromUrl)) {
+							resolvedFileName = nameFromUrl;
+						}
+					}
+				} catch (Exception e) {
+					Logger.log("Could not load metadata for orphaned download " + dirName + ": " + e.getMessage());
+				}
+				if (resolvedFileName == null) {
+					resolvedFileName = "Unknown download (recovered)";
+				}
+				try {
+					DownloadEntry ent = new DownloadEntry();
+					ent.setId(dirName);
+					ent.setFile(resolvedFileName);
+					ent.setState(XDMConstants.PAUSED);
+					ent.setDate(dir.lastModified());
+					downloads.put(dirName, ent);
+					Logger.log("Recovered orphaned download: " + dirName + " as \"" + resolvedFileName + "\"");
+				} catch (Exception e) {
+					Logger.log("Failed to recover orphaned download: " + dirName + " - " + e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			Logger.log("recoverOrphanedDownloads failed: " + e.getMessage());
+		}
+	}
+
 	private void loadDownloadList() {
 		File file = new File(Config.getInstance().getDataFolder(), "downloads.txt");
-		loadDownloadList(file);
+		if (file.exists()) {
+			try {
+				loadDownloadList(file);
+				return;
+			} catch (Exception e) {
+				Logger.log("Failed to load downloads.txt, trying backup: " + e.getMessage());
+			}
+		}
+		// Try backup file
+		File bak = new File(Config.getInstance().getDataFolder(), "downloads.txt.bak");
+		if (bak.exists()) {
+			Logger.log("Loading download list from backup file");
+			loadDownloadList(bak);
+		}
 	}
 
 	public void loadDownloadList(File file) {
@@ -861,8 +985,18 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 		BufferedWriter writer = null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String newLine = System.getProperty("line.separator");
+		File tmpFile = new File(file.getParentFile(), file.getName() + ".tmp");
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8")));
+			// Back up existing file before writing
+			if (file.exists()) {
+				File bak = new File(file.getParentFile(), file.getName() + ".bak");
+				try {
+					Files.copy(file.toPath(), bak.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				} catch (Exception e) {
+					Logger.log("Failed to create backup: " + e.getMessage());
+				}
+			}
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmpFile), Charset.forName("UTF-8")));
 			writer.write(count + "");
 			writer.newLine();
 			Iterator<String> keyIterator = downloads.keySet().iterator();
@@ -906,12 +1040,23 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 
 			}
 			writer.close();
+			writer = null;
+			// Atomic move: tmp -> file
+			try {
+				Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
+						StandardCopyOption.ATOMIC_MOVE);
+			} catch (AtomicMoveNotSupportedException e) {
+				tmpFile.renameTo(file);
+			}
 		} catch (Exception e) {
 			Logger.log(e);
 			try {
 				if (writer != null)
 					writer.close();
 			} catch (Exception e1) {
+			}
+			if (tmpFile != null && tmpFile.exists()) {
+				tmpFile.delete();
 			}
 		}
 	}

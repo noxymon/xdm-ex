@@ -1,16 +1,16 @@
 package xdman.videoparser;
 
-import xdman.Config;
-import xdman.network.http.JavaHttpClient;
-import xdman.util.Logger;
-import xdman.util.XDMUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import xdman.Config;
+import xdman.network.http.JavaHttpClient;
+import xdman.util.Logger;
+import xdman.util.XDMUtils;
 
 public class ThumbnailDownloader implements Runnable {
 	private String[] thumbnails;

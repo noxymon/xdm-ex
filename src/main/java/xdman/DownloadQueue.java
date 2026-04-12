@@ -1,9 +1,9 @@
 package xdman;
 
-import xdman.util.Logger;
-
 import java.util.ArrayList;
 import java.util.Date;
+
+import xdman.util.Logger;
 
 public class DownloadQueue {
 	private boolean running;

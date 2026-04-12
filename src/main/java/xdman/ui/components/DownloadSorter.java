@@ -1,10 +1,8 @@
 package xdman.ui.components;
 
-import xdman.Config;
-import xdman.DownloadEntry;
-import xdman.XDMApp;
-
 import java.util.Comparator;
+
+import xdman.*;
 
 public class DownloadSorter implements Comparator<String> {
 

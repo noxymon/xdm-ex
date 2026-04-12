@@ -1,8 +1,13 @@
 package xdman.ui.laf;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.AbstractButton;
+import javax.swing.ButtonModel;
+import javax.swing.JComponent;
 import javax.swing.plaf.basic.BasicButtonUI;
-import java.awt.*;
 
 public class XDMToolBarButtonUI extends BasicButtonUI {
 	Color pressedColor = new Color(170, 170, 170), rolloverColor = new Color(

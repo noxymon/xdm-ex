@@ -1,6 +1,6 @@
 package xdman.network;
 
-import java.io.IOException;
+import java.io.*;
 
 @SuppressWarnings("serial")
 public class NetworkException extends IOException {

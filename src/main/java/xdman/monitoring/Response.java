@@ -1,9 +1,9 @@
 package xdman.monitoring;
 
-import xdman.network.http.HeaderCollection;
-
 import java.io.IOException;
 import java.io.OutputStream;
+
+import xdman.network.http.HeaderCollection;
 
 public class Response {
 	private int code;

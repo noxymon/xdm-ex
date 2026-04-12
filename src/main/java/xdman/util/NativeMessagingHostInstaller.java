@@ -1,17 +1,23 @@
 package xdman.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
+
 import xdman.Config;
 import xdman.XDMApp;
 import xdman.ui.components.MessageBox;
 
-import java.io.*;
-
 public class NativeMessagingHostInstaller {
 	private static final String CHROME_EXTENSION_IDS = String.join(",",
 			"\"chrome-extension://danmljfachfhpbfikjgedlfifabhofcj/\"",
-			"\"chrome-extension://dkckaoghoiffdbomfbbodbbgmhjblecj/\"");
+			"\"chrome-extension://dkckaoghoiffdbomfbbodbbgmhjblecj/\"",
+			"\"chrome-extension://xdm-chrome-mv3-placeholder/\"");
 
 	private static final String FIREFOX_EXTENSION_IDS = String.join(",", "\"browser-mon@xdman.sourceforge.net\"");
 

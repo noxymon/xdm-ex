@@ -1,16 +1,17 @@
 package xdman.monitoring;
 
-import xdman.network.http.HeaderCollection;
-import xdman.util.NetUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import xdman.network.http.HeaderCollection;
+import xdman.util.NetUtils;
 
 public class Request {
 	private String url;
 	private HeaderCollection headers;
 	private byte[] body;
 	private int method;
+	private String methodStr;
 
 	public void read(InputStream in) throws IOException {
 		String reqLine = NetUtils.readLine(in);
@@ -23,6 +24,7 @@ public class Request {
 			throw new IOException("Invalid request: " + reqLine);
 		}
 		this.url = arr[1];
+		this.methodStr = arr[0].toUpperCase();
 		this.method = arr[0].toLowerCase().equals("post") ? 1 : 2;
 		this.headers = new HeaderCollection();
 		headers.loadFromStream(in);
@@ -72,5 +74,9 @@ public class Request {
 
 	public final void setMethod(int method) {
 		this.method = method;
+	}
+
+	public final String getMethodStr() {
+		return methodStr;
 	}
 }

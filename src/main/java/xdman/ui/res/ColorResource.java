@@ -1,7 +1,7 @@
 package xdman.ui.res;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class ColorResource {
 	public static final Color getActiveTabColor() {

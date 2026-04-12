@@ -1,8 +1,31 @@
 package xdman.downloaders.hls;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import xdman.Config;
 import xdman.XDMConstants;
-import xdman.downloaders.*;
+import xdman.downloaders.AbstractChannel;
+import xdman.downloaders.Downloader;
+import xdman.downloaders.Segment;
+import xdman.downloaders.SegmentDetails;
+import xdman.downloaders.SegmentImpl;
+import xdman.downloaders.SegmentInfo;
 import xdman.downloaders.http.HttpChannel;
 import xdman.downloaders.metadata.HlsMetadata;
 import xdman.downloaders.metadata.HttpMetadata;
@@ -13,9 +36,6 @@ import xdman.util.FormatUtilities;
 import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
-
-import java.io.*;
-import java.util.*;
 
 public class HlsDownloader extends Downloader implements MediaConversionListener, HlsEncryptedSouce {
 	private HlsMetadata metadata;
@@ -465,8 +485,13 @@ public class HlsDownloader extends Downloader implements MediaConversionListener
 			FileOutputStream fs = new FileOutputStream(tmp);
 			fs.write(sb.toString().getBytes());
 			fs.close();
-			out.delete();
-			tmp.renameTo(out);
+			try {
+				Files.move(tmp.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING,
+						StandardCopyOption.ATOMIC_MOVE);
+			} catch (AtomicMoveNotSupportedException e) {
+				out.delete();
+				tmp.renameTo(out);
+			}
 		} catch (Exception e) {
 			Logger.log(e);
 		}
@@ -599,11 +624,63 @@ public class HlsDownloader extends Downloader implements MediaConversionListener
 		return newExtension;
 	}
 
+	private boolean allSegmentsAreTs() {
+		for (HlsPlaylistItem item : items) {
+			String url = item.getUrl();
+			if (url == null) return false;
+			String lower = url.toLowerCase();
+			int qIdx = lower.indexOf('?');
+			String path = qIdx >= 0 ? lower.substring(0, qIdx) : lower;
+			if (!path.endsWith(".ts")) return false;
+		}
+		return true;
+	}
+
+	private void assembleBinaryConcat(File outFile) throws IOException {
+		byte[] buf = new byte[8192 * 8];
+		try (OutputStream out = new FileOutputStream(outFile)) {
+			for (Segment s : chunks) {
+				File segFile = new File(folder, s.getId());
+				try (InputStream in = new FileInputStream(segFile)) {
+					int r;
+					while ((r = in.read(buf)) != -1) {
+						out.write(buf, 0, r);
+					}
+				}
+			}
+		}
+	}
+
 	private void assemble() throws IOException {
 		File ffOutFile = null;
 		XDMUtils.mkdirs(getOutputFolder());
 		try {
 			assembleFinished = false;
+
+			// Ensure output filename has an extension
+			String outputFileName = getOutputFileName(true);
+			if (XDMUtils.getExtension(outputFileName) == null || XDMUtils.getExtension(outputFileName).isEmpty()) {
+				outputFileName = outputFileName + ".ts";
+			}
+
+			// Binary concatenation fallback for original format with all .ts segments
+			if (outputFormat == 0 && allSegmentsAreTs()) {
+				Logger.log("HLS: Using binary concatenation for .ts segments");
+				ffOutFile = new File(getOutputFolder(), UUID.randomUUID().toString() + ".tmp");
+				assembleBinaryConcat(ffOutFile);
+				long length = ffOutFile.length();
+				if (length > 0) {
+					this.length = length;
+				}
+				File realFile = new File(getOutputFolder(), outputFileName);
+				if (realFile.exists()) {
+					realFile.delete();
+				}
+				ffOutFile.renameTo(realFile);
+				assembleFinished = true;
+				return;
+			}
+
 			StringBuffer sb = new StringBuffer();
 			for (Segment s : chunks) {
 				sb.append("file '" + new File(folder, s.getId()) + "'\r\n");
@@ -619,7 +696,8 @@ public class HlsDownloader extends Downloader implements MediaConversionListener
 			this.converting = true;
 			List<String> inputFiles = new ArrayList<String>();
 			inputFiles.add(hlsFile.getAbsolutePath());
-			ffOutFile = new File(getOutputFolder(), UUID.randomUUID() + "_" + getOutputFileName(true));
+			// Use UUID-only temp filename to avoid non-ASCII path issues
+			ffOutFile = new File(getOutputFolder(), UUID.randomUUID().toString() + ".tmp");
 			this.ffmpeg = new FFmpeg(inputFiles, ffOutFile.getAbsolutePath(), this,
 					MediaFormats.getSupportedFormats()[outputFormat], outputFormat == 0);
 			ffmpeg.setHls(true);
@@ -628,7 +706,7 @@ public class HlsDownloader extends Downloader implements MediaConversionListener
 			Logger.log("FFmpeg exit code: " + ret);
 
 			if (ret != 0) {
-				throw new IOException("FFmpeg failed");
+				throw new IOException("FFmpeg failed: " + ffmpeg.getLastOutput());
 			} else {
 				long length = ffOutFile.length();
 				if (length > 0) {
@@ -637,7 +715,7 @@ public class HlsDownloader extends Downloader implements MediaConversionListener
 			}
 
 			// delete the original file if exists and rename the temp file to original
-			File realFile = new File(getOutputFolder(), getOutputFileName(true));
+			File realFile = new File(getOutputFolder(), outputFileName);
 			if (realFile.exists()) {
 				realFile.delete();
 			}

@@ -1,5 +1,8 @@
 package xdman.monitoring;
 
+import java.io.File;
+import java.util.List;
+
 import xdman.XDMApp;
 import xdman.downloaders.hls.HlsPlaylist;
 import xdman.downloaders.hls.HlsPlaylistItem;
@@ -7,9 +10,6 @@ import xdman.downloaders.hls.PlaylistParser;
 import xdman.downloaders.metadata.HlsMetadata;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
-
-import java.io.File;
-import java.util.List;
 
 public class M3U8Handler {
 	public static boolean handle(File m3u8file, ParsedHookData data) {

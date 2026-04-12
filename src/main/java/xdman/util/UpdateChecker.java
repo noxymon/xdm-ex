@@ -1,14 +1,14 @@
 package xdman.util;
 
-import xdman.Config;
-import xdman.XDMApp;
-import xdman.network.http.JavaHttpClient;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import xdman.Config;
+import xdman.XDMApp;
+import xdman.network.http.JavaHttpClient;
 
 public class UpdateChecker {
 

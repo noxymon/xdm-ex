@@ -1,19 +1,7 @@
 package xdman.ui.components;
 
-import org.tukaani.xz.XZInputStream;
-import xdman.Config;
-import xdman.DownloadListener;
-import xdman.downloaders.http.HttpDownloader;
-import xdman.downloaders.metadata.HttpMetadata;
-import xdman.ui.res.ColorResource;
-import xdman.ui.res.FontResource;
-import xdman.util.FFExtractCallback;
-import xdman.util.Logger;
-import xdman.util.XDMUtils;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -25,6 +13,27 @@ import java.io.OutputStream;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.EmptyBorder;
+
+import org.tukaani.xz.XZInputStream;
+
+import xdman.Config;
+import xdman.DownloadListener;
+import xdman.downloaders.http.HttpDownloader;
+import xdman.downloaders.metadata.HttpMetadata;
+import xdman.ui.res.ColorResource;
+import xdman.ui.res.FontResource;
+import xdman.util.FFExtractCallback;
+import xdman.util.Logger;
+import xdman.util.XDMUtils;
+
 
 import static xdman.util.XDMUtils.getScaledInt;
 

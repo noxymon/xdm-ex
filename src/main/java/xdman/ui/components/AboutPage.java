@@ -1,14 +1,17 @@
 package xdman.ui.components;
 
+import static xdman.util.XDMUtils.getScaledInt;
+
+import java.awt.Dimension;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
 import xdman.XDMApp;
 import xdman.ui.res.ColorResource;
 import xdman.ui.res.FontResource;
 import xdman.ui.res.StringResource;
-
-import javax.swing.*;
-import java.awt.*;
-
-import static xdman.util.XDMUtils.getScaledInt;
 
 public class AboutPage extends Page {
 	/**

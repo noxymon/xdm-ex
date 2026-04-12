@@ -1,16 +1,22 @@
 package xdman;
 
-import xdman.util.Base64;
-import xdman.util.Logger;
-import xdman.util.StringUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.PasswordAuthentication;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import xdman.util.Base64;
+import xdman.util.Logger;
+import xdman.util.StringUtils;
 
 public class CredentialManager {
 	private Map<String, PasswordAuthentication> savedCredentials;

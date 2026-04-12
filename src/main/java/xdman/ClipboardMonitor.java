@@ -1,11 +1,11 @@
 package xdman;
 
+import java.net.URI;
+
 import xdman.downloaders.metadata.HttpMetadata;
 import xdman.util.Logger;
 import xdman.util.StringUtils;
 import xdman.util.XDMUtils;
-
-import java.net.URI;
 
 public class ClipboardMonitor implements Runnable {
 

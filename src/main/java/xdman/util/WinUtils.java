@@ -1,11 +1,11 @@
 package xdman.util;
 
-import xdman.win32.NativeMethods;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import xdman.win32.NativeMethods;
 
 public class WinUtils {
 	public static void open(File f) throws FileNotFoundException {

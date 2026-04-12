@@ -1,13 +1,13 @@
 package xdman;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 import xdman.util.DateTimeUtils;
 import xdman.util.Logger;
 import xdman.util.UpdateChecker;
 import xdman.util.XDMUtils;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class QueueScheduler implements Runnable {
 	// private boolean stop;

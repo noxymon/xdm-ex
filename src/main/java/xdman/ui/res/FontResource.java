@@ -1,9 +1,9 @@
 package xdman.ui.res;
 
+import java.awt.Font;
+
 import xdman.util.Logger;
 import xdman.util.XDMUtils;
-
-import java.awt.*;
 
 public class FontResource {
 	static {
@@ -14,36 +14,9 @@ public class FontResource {
 	private static final String FALLBACK_FONT = "Segoe UI Variable Text";
 
 	private static Font createFont(int style, int size) {
-		int scaledSize = XDMUtils.getScaledInt(size);
-		Font font = new Font(MODERN_FONT, style, scaledSize);
+		Font font = new Font(MODERN_FONT, style, XDMUtils.getScaledInt(size));
 		if (font.getFamily().equalsIgnoreCase("Dialog") || font.getFamily().equalsIgnoreCase("SansSerif")) {
-			font = new Font(FALLBACK_FONT, style, scaledSize);
-		}
-		// Add CJK fallback if the font cannot display CJK characters
-		if (font.canDisplayUpTo("\u4e2d\u6587") >= 0) {
-			int os = XDMUtils.detectOS();
-			String[] cjkFonts;
-			if (os == XDMUtils.WINDOWS) {
-				cjkFonts = new String[]{"Microsoft YaHei", "SimHei"};
-			} else if (os == XDMUtils.LINUX) {
-				cjkFonts = new String[]{"Noto Sans CJK SC", "WenQuanYi Micro Hei"};
-			} else {
-				cjkFonts = new String[]{};
-			}
-			Font cjkFont = null;
-			for (String fontName : cjkFonts) {
-				Font candidate = new Font(fontName, style, scaledSize);
-				if (!candidate.getFamily().equalsIgnoreCase("Dialog")
-						&& candidate.canDisplayUpTo("\u4e2d\u6587") < 0) {
-					cjkFont = candidate;
-					break;
-				}
-			}
-			if (cjkFont == null) {
-				// Use system composite font as final fallback
-				cjkFont = new Font(Font.SANS_SERIF, style, scaledSize);
-			}
-			font = cjkFont;
+			font = new Font(FALLBACK_FONT, style, XDMUtils.getScaledInt(size));
 		}
 		return font;
 	}

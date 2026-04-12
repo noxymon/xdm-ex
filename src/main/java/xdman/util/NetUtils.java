@@ -1,13 +1,9 @@
 package xdman.util;
 
-import xdman.network.http.ChunkedInputStream;
-import xdman.network.http.HeaderCollection;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.zip.GZIPInputStream;
+
+import xdman.network.http.*;
 
 public class NetUtils {
 	public static byte[] getBytes(String str) {
@@ -107,29 +103,12 @@ public class NetUtils {
 		try {
 			String arr[] = header.split(";");
 			for (String str : arr) {
-				str = str.trim();
-				if (str.toLowerCase().contains("filename*")) {
-					// RFC 5987 format: filename*=charset'language'encoded-value
-					int eqIndex = str.indexOf('=');
-					if (eqIndex < 0) continue;
-					String value = str.substring(eqIndex + 1).trim();
-					// Remove surrounding quotes if present
-					if (value.startsWith("\"") && value.endsWith("\"")) {
-						value = value.substring(1, value.length() - 1);
+				if (str.contains("filename*")) {
+					int index = str.lastIndexOf("'");
+					if (index > 0) {
+						String st = str.substring(index + 1);
+						return XDMUtils.decodeFileName(st);
 					}
-					// Extract charset from before first '
-					int firstQuote = value.indexOf('\'');
-					int secondQuote = firstQuote >= 0 ? value.indexOf('\'', firstQuote + 1) : -1;
-					String charset = "UTF-8";
-					String encodedValue = value;
-					if (firstQuote >= 0 && secondQuote > firstQuote) {
-						String extractedCharset = value.substring(0, firstQuote).trim();
-						if (!extractedCharset.isEmpty()) {
-							charset = extractedCharset;
-						}
-						encodedValue = value.substring(secondQuote + 1);
-					}
-					return java.net.URLDecoder.decode(encodedValue, java.nio.charset.Charset.forName(charset));
 				}
 			}
 		} catch (Exception e) {
@@ -156,22 +135,11 @@ public class NetUtils {
 						String file = str.substring(index + 1).replace("\"", "")
 								.trim();
 						try {
-							file = XDMUtils.decodeFileName(file);
+							return XDMUtils.decodeFileName(file);
 						} catch (Exception e) {
-							// keep original value
+							return file;
 						}
-						// Apply UTF-8 re-decode heuristic for raw non-ASCII filenames
-						try {
-							String utf8Attempt = new String(file.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-							java.nio.charset.CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder()
-								.onMalformedInput(CodingErrorAction.REPORT)
-								.onUnmappableCharacter(CodingErrorAction.REPORT);
-							decoder.decode(java.nio.ByteBuffer.wrap(utf8Attempt.getBytes(StandardCharsets.UTF_8)));
-							file = utf8Attempt;
-						} catch (Exception e) {
-							// keep original value
-						}
-						return file;
+
 					}
 				}
 			}

@@ -1,13 +1,20 @@
 package xdman.ui.components;
 
-import xdman.ui.res.ColorResource;
-import xdman.ui.res.FontResource;
+import static xdman.util.XDMUtils.getScaledInt;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.font.LineMetrics;
 
-import static xdman.util.XDMUtils.getScaledInt;
+import javax.swing.JComponent;
+
+import xdman.ui.res.ColorResource;
+import xdman.ui.res.FontResource;
 
 public class CircleProgressBar extends JComponent {
 	private static final long serialVersionUID = 3778513245025142955L;
