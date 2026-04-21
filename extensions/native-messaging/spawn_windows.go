@@ -20,6 +20,7 @@ func SpawnProcess() {
 	flags := uint32(syscall.CREATE_UNICODE_ENVIRONMENT)
 	flags |= CreateBreakAwayFromJob
 	flags |= CreateNewProcessGroup
+	flags |= CreateNoWindow
 
 	path,err:=os.Executable()
 

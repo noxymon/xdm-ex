@@ -107,6 +107,7 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 
 	private long lastAddDownloadTime = 0;
 	private String lastAddDownloadUrl = null;
+	private String lastAddDownloadFile = null;
 
 	private ArrayList<VideoPopupItem> itemList = new ArrayList<>();
 
@@ -447,13 +448,20 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 
 	public void addDownload(final HttpMetadata metadata, final String file) {
 		if (metadata != null) {
-			long now = System.currentTimeMillis();
-			if (metadata.getUrl().equals(lastAddDownloadUrl) && (now - lastAddDownloadTime) < 1500) {
-				Logger.log("Duplicate download request ignored for url: " + metadata.getUrl());
-				return;
+			synchronized (this) {
+				long now = System.currentTimeMillis();
+				String currentFile = StringUtils.isNullOrEmptyOrBlank(file) ? XDMUtils.getFileName(metadata.getUrl()) : file;
+				boolean isDuplicateUrl = metadata.getUrl().equals(lastAddDownloadUrl);
+				boolean isDuplicateFile = currentFile != null && currentFile.equals(lastAddDownloadFile);
+				
+				if ((isDuplicateUrl || isDuplicateFile) && (now - lastAddDownloadTime) < 1500) {
+					Logger.log("Duplicate download request ignored for url: " + metadata.getUrl());
+					return;
+				}
+				lastAddDownloadUrl = metadata.getUrl();
+				lastAddDownloadFile = currentFile;
+				lastAddDownloadTime = now;
 			}
-			lastAddDownloadUrl = metadata.getUrl();
-			lastAddDownloadTime = now;
 		}
 		if (refreshCallback != null) {
 			if (refreshCallback.isValidLink(metadata)) {

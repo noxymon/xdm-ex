@@ -48,7 +48,10 @@ var lastChanged time.Time
 const CreateBreakAwayFromJob uint32 = 0x01000000
 
 //CreateNewProcessGroup constant for win32 flag CREATE_NEW_PROCESS_GROUP
-const CreateNewProcessGroup uint32 = 0x01000000
+const CreateNewProcessGroup uint32 = 0x00000200
+
+//CreateNoWindow constant for win32 flag CREATE_NO_WINDOW
+const CreateNoWindow uint32 = 0x08000000
 
 func readInt32() int64 {
 	//log.WriteString("reading chunk size\n")
@@ -56,11 +59,11 @@ func readInt32() int64 {
 	in := make([]byte, 4)
 	c, err := os.Stdin.Read(in)
 	if c != 4 || err != nil {
-		panic("Invalid chunk size")
+		os.Exit(0)
 	}
 	err = binary.Read(bytes.NewBuffer(in), binary.LittleEndian, &chunkSize)
 	if err != nil {
-		panic("could not read chunk size")
+		os.Exit(0)
 	}
 	//log.WriteString("chunk size: " + strconv.FormatInt(int64(chunkSize), 10) + "\n")
 	return int64(chunkSize)
@@ -83,7 +86,7 @@ func readNativeMessage() string {
 	//log.WriteString("message size: " + strconv.FormatInt(int64(c), 10) + "\n")
 
 	if err != nil {
-		panic("Error reading message body")
+		os.Exit(0)
 	}
 	// log.WriteString("Raw buffer\n")
 	// log.Write(buf)
@@ -243,7 +246,7 @@ func watchForSettingsChange(){
 	userHome,err:=os.UserHomeDir()
 	if err!=nil{
 		//log.WriteString("Unble to get user home!\n")
-		panic("Unble to get user home!\n")
+		os.Exit(0)
 	}
 	keyFile:=path.Join(userHome,".xdman","settings_updated")
 	settingsFile:=path.Join(userHome,".xdman","settings.json")
