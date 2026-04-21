@@ -1,37 +1,5 @@
 package xdman;
 
-import java.awt.EventQueue;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.PasswordAuthentication;
-import java.nio.charset.Charset;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
 import xdman.downloaders.Downloader;
 import xdman.downloaders.dash.DashDownloader;
 import xdman.downloaders.ftp.FtpDownloader;
@@ -44,27 +12,25 @@ import xdman.downloaders.metadata.HlsMetadata;
 import xdman.downloaders.metadata.HttpMetadata;
 import xdman.monitoring.BrowserMonitor;
 import xdman.network.http.HttpContext;
-import xdman.ui.components.BatchDownloadWnd;
-import xdman.ui.components.ComponentInstaller;
-import xdman.ui.components.DownloadCompleteWnd;
-import xdman.ui.components.DownloadWindow;
-import xdman.ui.components.MainWindow;
-import xdman.ui.components.NewDownloadWindow;
-import xdman.ui.components.TrayHandler;
-import xdman.ui.components.VideoDownloadWindow;
-import xdman.ui.components.VideoPopup;
-import xdman.ui.components.VideoPopupItem;
+import xdman.ui.components.*;
 import xdman.ui.res.StringResource;
-import xdman.util.FFmpegDownloader;
-import xdman.util.LinuxUtils;
-import xdman.util.Logger;
-import xdman.util.MacUtils;
-import xdman.util.NativeMessagingHostInstaller;
-import xdman.util.ParamUtils;
-import xdman.util.StringUtils;
-import xdman.util.UpdateChecker;
-import xdman.util.WinUtils;
-import xdman.util.XDMUtils;
+import xdman.util.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.net.PasswordAuthentication;
+import java.nio.charset.Charset;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class XDMApp implements DownloadListener, DownloadWindowListener, Comparator<String> {
 	public static final String GLOBAL_LOCK_FILE = ".xdm-global-lock";
@@ -1010,10 +976,10 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 
 	public void saveDownloadList(File file) {
 		int count = downloads.size();
-		BufferedWriter writer = null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String newLine = System.getProperty("line.separator");
 		File tmpFile = new File(file.getParentFile(), file.getName() + ".tmp");
+
 		try {
 			// Back up existing file before writing
 			if (file.exists()) {
@@ -1024,51 +990,51 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 					Logger.log("Failed to create backup: " + e.getMessage());
 				}
 			}
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmpFile), Charset.forName("UTF-8")));
-			writer.write(count + "");
-			writer.newLine();
-			Iterator<String> keyIterator = downloads.keySet().iterator();
-			while (keyIterator.hasNext()) {
-				String key = keyIterator.next();
-				DownloadEntry ent = downloads.get(key);
-				int c = 0;
-				StringBuffer sb = new StringBuffer();
-				sb.append("id: " + ent.getId() + newLine);
-				c++;
-				sb.append("file: " + ent.getFile() + newLine);
-				c++;
-				sb.append("category: " + ent.getCategory() + newLine);
-				c++;
-				sb.append("state: " + ent.getState() + newLine);
-				c++;
-				if (ent.getFolder() != null) {
-					sb.append("folder: " + ent.getFolder() + newLine);
-					c++;
-				}
-				sb.append("date: " + dateFormat.format(new Date(ent.getDate())) + newLine);
-				c++;
-				sb.append("downloaded: " + ent.getDownloaded() + newLine);
-				c++;
-				sb.append("size: " + ent.getSize() + newLine);
-				c++;
-				sb.append("progress: " + ent.getProgress() + newLine);
-				c++;
-				if (ent.getTempFolder() != null) {
-					sb.append("tempfolder: " + ent.getTempFolder() + newLine);
-					c++;
-				}
-				if (ent.getQueueId() != null) {
-					sb.append("queueid: " + ent.getQueueId() + newLine);
-					c++;
-				}
-				sb.append("formatIndex: " + ent.getOutputFormatIndex() + newLine);
-				c++;
-				writer.write(c + newLine);
-				writer.write(sb.toString());
 
+			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tmpFile), Charset.forName("UTF-8")))) {
+				writer.write(count + "");
+				writer.newLine();
+				Iterator<String> keyIterator = downloads.keySet().iterator();
+				while (keyIterator.hasNext()) {
+					String key = keyIterator.next();
+					DownloadEntry ent = downloads.get(key);
+					int c = 0;
+					StringBuffer sb = new StringBuffer();
+					sb.append("id: " + ent.getId() + newLine);
+					c++;
+					sb.append("file: " + ent.getFile() + newLine);
+					c++;
+					sb.append("category: " + ent.getCategory() + newLine);
+					c++;
+					sb.append("state: " + ent.getState() + newLine);
+					c++;
+					if (ent.getFolder() != null) {
+						sb.append("folder: " + ent.getFolder() + newLine);
+						c++;
+					}
+					sb.append("date: " + dateFormat.format(new Date(ent.getDate())) + newLine);
+					c++;
+					sb.append("downloaded: " + ent.getDownloaded() + newLine);
+					c++;
+					sb.append("size: " + ent.getSize() + newLine);
+					c++;
+					sb.append("progress: " + ent.getProgress() + newLine);
+					c++;
+					if (ent.getTempFolder() != null) {
+						sb.append("tempfolder: " + ent.getTempFolder() + newLine);
+						c++;
+					}
+					if (ent.getQueueId() != null) {
+						sb.append("queueid: " + ent.getQueueId() + newLine);
+						c++;
+					}
+					sb.append("formatIndex: " + ent.getOutputFormatIndex() + newLine);
+					c++;
+					writer.write(c + newLine);
+					writer.write(sb.toString());
+				}
 			}
-			writer.close();
-			writer = null;
+
 			// Atomic move: tmp -> file
 			try {
 				Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
@@ -1078,11 +1044,6 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 			}
 		} catch (Exception e) {
 			Logger.log(e);
-			try {
-				if (writer != null)
-					writer.close();
-			} catch (Exception e1) {
-			}
 			if (tmpFile != null && tmpFile.exists()) {
 				tmpFile.delete();
 			}
