@@ -351,3 +351,6 @@ MigrationBackup/
 
 target/
 /.idea/
+extensions/native-messaging/jre/
+extensions/native-messaging/native.exe
+extensions/native-messaging/*.jar

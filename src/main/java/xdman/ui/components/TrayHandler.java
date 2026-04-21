@@ -56,8 +56,10 @@ public class TrayHandler {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				MenuItem c = (MenuItem) e.getSource();
-				String name = c.getName();
+				String name = e.getActionCommand();
+				if (name == null && e.getSource() instanceof MenuItem) {
+					name = ((MenuItem) e.getSource()).getName();
+				}
 				if ("ADD_URL".equals(name)) {
 					XDMApp.getInstance().addDownload(null, null);
 				} else if ("RESTORE".equals(name)) {
@@ -87,22 +89,27 @@ public class TrayHandler {
 		addUrlItem.setFont(FontResource.getBigFont());
 		addUrlItem.addActionListener(act);
 		addUrlItem.setName("ADD_URL");
+		addUrlItem.setActionCommand("ADD_URL");
 		MenuItem addVidItem = new MenuItem(StringResource.get("MENU_VIDEO_DWN"));
 		addVidItem.setFont(FontResource.getBigFont());
 		addVidItem.addActionListener(act);
 		addVidItem.setName("ADD_VID");
+		addVidItem.setActionCommand("ADD_VID");
 		MenuItem addBatchItem = new MenuItem(StringResource.get("MENU_BATCH_DOWNLOAD"));
 		addBatchItem.setFont(FontResource.getBigFont());
 		addBatchItem.addActionListener(act);
 		addBatchItem.setName("ADD_BAT");
+		addBatchItem.setActionCommand("ADD_BAT");
 		MenuItem addClipItem = new MenuItem(StringResource.get("MENU_CLIP_ADD_MENU"));
 		addClipItem.setFont(FontResource.getBigFont());
 		addClipItem.addActionListener(act);
 		addClipItem.setName("ADD_CLIP");
+		addClipItem.setActionCommand("ADD_CLIP");
 		MenuItem restoreItem = new MenuItem(StringResource.get("MSG_RESTORE"));
 		restoreItem.setFont(FontResource.getBigFont());
 		restoreItem.addActionListener(act);
 		restoreItem.setName("RESTORE");
+		restoreItem.setActionCommand("RESTORE");
 		CheckboxMenuItem monitoringItem = new CheckboxMenuItem(StringResource.get("BROWSER_MONITORING"));
 		monitoringItem.addItemListener(new ItemListener() {
 
@@ -117,14 +124,17 @@ public class TrayHandler {
 		monitoringItem.setState(Config.getInstance().isBrowserMonitoringEnabled());
 		monitoringItem.addActionListener(act);
 		monitoringItem.setName("MONITORING");
+		monitoringItem.setActionCommand("MONITORING");
 		MenuItem throttleItem = new MenuItem(StringResource.get("MENU_SPEED_LIMITER"));
 		throttleItem.setFont(FontResource.getBigFont());
 		throttleItem.addActionListener(act);
 		throttleItem.setName("THROTTLE");
+		throttleItem.setActionCommand("THROTTLE");
 		MenuItem exitItem = new MenuItem(StringResource.get("MENU_EXIT"));
 		exitItem.setFont(FontResource.getBigFont());
 		exitItem.addActionListener(act);
 		exitItem.setName("EXIT");
+		exitItem.setActionCommand("EXIT");
 
 		// Add components to pop-up menu
 		popup.add(addUrlItem);
