@@ -56,6 +56,8 @@ public class Config {
 	private boolean fetchTs;
 	private boolean noTransparency;
 	private boolean hideTray;
+	private boolean minimizeToTrayOnClose;
+	private boolean closeToTray;
 	private String lastFolder;
 	private List<MonitoringListener> listeners;
 	private String queueIdFilter;
@@ -143,6 +145,8 @@ public class Config {
 			fw.write("noTransparency:" + this.noTransparency + newLine);
 			fw.write("forceSingleFolder:" + this.forceSingleFolder + newLine);
 			fw.write("hideTray:" + this.hideTray + newLine);
+			fw.write("minimizeToTrayOnClose:" + this.minimizeToTrayOnClose + newLine);
+			fw.write("closeToTray:" + this.closeToTray + newLine);
 			if (lastFolder != null) {
 				fw.write("lastFolder:" + this.lastFolder + newLine);
 			}
@@ -301,6 +305,10 @@ public class Config {
 					this.forceSingleFolder = "true".equals(val);
 				} else if (key.equals("hideTray")) {
 					this.hideTray = "true".equals(val);
+				} else if (key.equals("minimizeToTrayOnClose")) {
+					this.minimizeToTrayOnClose = "true".equals(val);
+				} else if (key.equals("closeToTray")) {
+					this.closeToTray = "true".equals(val);
 				} else if (key.equals("lastFolder")) {
 					this.lastFolder = val;
 				} else if (key.equals("showVideoListOnlyInBrowser")) {
@@ -386,6 +394,7 @@ public class Config {
 		this.monitorClipboard = false;
 		this.noTransparency = false;
 		this.hideTray = true;
+		this.minimizeToTrayOnClose = false;
 		this.listeners = new ArrayList<>();
 
 	}
@@ -906,6 +915,14 @@ public class Config {
 
 	public void setHideTray(boolean hideTray) {
 		this.hideTray = hideTray;
+	}
+
+	public boolean isMinimizeToTrayOnClose() {
+		return minimizeToTrayOnClose;
+	}
+
+	public void setMinimizeToTrayOnClose(boolean minimizeToTrayOnClose) {
+		this.minimizeToTrayOnClose = minimizeToTrayOnClose;
 	}
 
 	public String getLastFolder() {

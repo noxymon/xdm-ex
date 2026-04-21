@@ -104,7 +104,11 @@ public class MainWindow extends XDMFrame implements ActionListener {
 		addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-				XDMApp.getInstance().exit();
+				if (Config.getInstance().isMinimizeToTrayOnClose()) {
+					setVisible(false);
+				} else {
+					XDMApp.getInstance().exit();
+				}
 			}
 		});
 		if (Config.getInstance().isFirstRun()) {

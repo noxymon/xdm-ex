@@ -331,3 +331,4 @@ LBL_SHOW_PROGRESS=Lihat proses
 LBL_FILE_TYPE=Tipe berkas
 LBL_ALL_QUEUE=Semua antrian
 LBL_SHOW_VIDEO_ONLY_IN_BROWSER=Nonaktifkan pesan 'UNDUH VIDEO'
+LBL_MINIMIZE_TO_TRAY=Minimalkan ke baki saat ditutup
