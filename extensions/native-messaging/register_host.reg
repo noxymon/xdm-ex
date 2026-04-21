@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\xdm_chrome.native_host]
+@="C:\\Users\\USER\\Documents\\Code\\xdm-ex\\extensions\\native-messaging\\xdm_chrome.native_host.json"

@@ -32,7 +32,7 @@ public class XDMButtonUI extends BasicButtonUI {
 		if (c instanceof JButton) {
 			JButton btn = (JButton) c;
 			if (!(c instanceof CustomButton)) {
-				c.setForeground(Color.WHITE);
+				c.setForeground(ColorResource.getDeepFontColor());
 				c.setBackground(ColorResource.getButtonBackColor());
 				btn.setBorderPainted(false);
 			}

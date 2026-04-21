@@ -29,8 +29,8 @@ public class CustomButton extends JButton {
 		setFocusPainted(false);
 		setContentAreaFilled(true);
 		
-		// Set default arc for rounded corners
-		putClientProperty(FlatClientProperties.STYLE, "arc: 8;");
+		// Set default arc to 0 for sharp corners
+		putClientProperty(FlatClientProperties.STYLE, "arc: 0;");
 	}
 
 	public void setArc(int arc) {

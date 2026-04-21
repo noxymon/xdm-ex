@@ -105,6 +105,9 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 											// notification is stored in this
 											// variable
 
+	private long lastAddDownloadTime = 0;
+	private String lastAddDownloadUrl = null;
+
 	private ArrayList<VideoPopupItem> itemList = new ArrayList<>();
 
 	public static void instanceStarted() {
@@ -208,11 +211,19 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 	}
 
 	public void showMainWindow() {
-		if (mainWindow == null) {
-			mainWindow = new MainWindow();
-		}
-		mainWindow.setVisible(true);
-		mainWindow.toFront();
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (mainWindow == null) {
+					mainWindow = new MainWindow();
+				}
+				if ((mainWindow.getExtendedState() & java.awt.Frame.ICONIFIED) == java.awt.Frame.ICONIFIED) {
+					mainWindow.setExtendedState(mainWindow.getExtendedState() & ~java.awt.Frame.ICONIFIED);
+				}
+				mainWindow.setVisible(true);
+				mainWindow.toFront();
+			}
+		});
 	}
 
 	private XDMApp() {
@@ -435,6 +446,15 @@ public class XDMApp implements DownloadListener, DownloadWindowListener, Compara
 	}
 
 	public void addDownload(final HttpMetadata metadata, final String file) {
+		if (metadata != null) {
+			long now = System.currentTimeMillis();
+			if (metadata.getUrl().equals(lastAddDownloadUrl) && (now - lastAddDownloadTime) < 1500) {
+				Logger.log("Duplicate download request ignored for url: " + metadata.getUrl());
+				return;
+			}
+			lastAddDownloadUrl = metadata.getUrl();
+			lastAddDownloadTime = now;
+		}
 		if (refreshCallback != null) {
 			if (refreshCallback.isValidLink(metadata)) {
 				return;

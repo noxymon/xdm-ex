@@ -87,12 +87,12 @@ public class DownloadCompleteWnd extends JDialog implements ActionListener {
 		JLabel lblFile = new JLabel(StringResource.get("ND_FILE"), JLabel.RIGHT);
 		// lblFile.setVerticalTextPosition(JLabel.CENTER);//VerticalAlignment(JLabel.CENTER);
 		lblFile.setBounds(0, getScaledInt(75), getScaledInt(70), getScaledInt(20));
-		lblFile.setForeground(Color.WHITE);
+		lblFile.setForeground(ColorResource.getDeepFontColor());
 		add(lblFile);
 
 		JLabel lblSave = new JLabel(StringResource.get("CD_LOC"), JLabel.RIGHT);
 		lblSave.setBounds(0, getScaledInt(100), getScaledInt(70), getScaledInt(20));
-		lblSave.setForeground(Color.WHITE);
+		lblSave.setForeground(ColorResource.getDeepFontColor());
 		add(lblSave);
 
 		txtFile = new JTextField();
@@ -100,7 +100,7 @@ public class DownloadCompleteWnd extends JDialog implements ActionListener {
 		txtFile.setEditable(false);
 		txtFile.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
 		txtFile.setBackground(ColorResource.getDarkestBgColor());
-		txtFile.setForeground(Color.WHITE);
+		txtFile.setForeground(ColorResource.getDeepFontColor());
 		txtFile.setBounds(getScaledInt(80), getScaledInt(75), getScaledInt(220), getScaledInt(20));
 		txtFile.setCaretColor(ColorResource.getSelectionColor());
 		add(txtFile);
@@ -110,7 +110,7 @@ public class DownloadCompleteWnd extends JDialog implements ActionListener {
 		txtFolder.setEditable(false);
 		txtFolder.setBorder(new LineBorder(ColorResource.getSelectionColor(), 1));
 		txtFolder.setBackground(ColorResource.getDarkestBgColor());
-		txtFolder.setForeground(Color.WHITE);
+		txtFolder.setForeground(ColorResource.getDeepFontColor());
 		txtFolder.setBounds(getScaledInt(80), getScaledInt(100), getScaledInt(220), getScaledInt(20));
 		txtFolder.setCaretColor(ColorResource.getSelectionColor());
 		add(txtFolder);
@@ -118,7 +118,7 @@ public class DownloadCompleteWnd extends JDialog implements ActionListener {
 		chkDontShow = new JCheckBox(StringResource.get("MSG_DONT_SHOW_AGAIN"));
 		chkDontShow.setBackground(ColorResource.getDarkestBgColor());
 		chkDontShow.setName("MSG_DONT_SHOW_AGAIN");
-		chkDontShow.setForeground(Color.WHITE);
+		chkDontShow.setForeground(ColorResource.getDeepFontColor());
 		chkDontShow.setFocusPainted(false);
 
 		chkDontShow.setBounds(getScaledInt(75), getScaledInt(125), getScaledInt(200), getScaledInt(20));
@@ -157,7 +157,7 @@ public class DownloadCompleteWnd extends JDialog implements ActionListener {
 	private void styleButton(CustomButton btn) {
 		btn.setBackground(ColorResource.getDarkestBgColor());
 		btn.setPressedBackground(ColorResource.getDarkerBgColor());
-		btn.setForeground(Color.WHITE);
+		btn.setForeground(ColorResource.getDeepFontColor());
 		btn.setFont(FontResource.getBigFont());
 		btn.setBorderPainted(false);
 		btn.setMargin(new Insets(0, 0, 0, 0));

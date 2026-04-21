@@ -537,22 +537,24 @@
             }
         });
 
-        chrome.contextMenus.create({
-            title: "Download with XDM",
-            contexts: ["link", "video", "audio"],
-            onclick: sendLinkToXDM,
-        });
+        chrome.runtime.onInstalled.addListener(function() {
+            chrome.contextMenus.create({
+                title: "Download with XDM",
+                contexts: ["link", "video", "audio"],
+                onclick: sendLinkToXDM,
+            });
 
-        chrome.contextMenus.create({
-            title: "Download Image with XDM",
-            contexts: ["image"],
-            onclick: sendImageToXDM,
-        });
+            chrome.contextMenus.create({
+                title: "Download Image with XDM",
+                contexts: ["image"],
+                onclick: sendImageToXDM,
+            });
 
-        chrome.contextMenus.create({
-            title: "Download all links",
-            contexts: ["all"],
-            onclick: runContentScript,
+            chrome.contextMenus.create({
+                title: "Download all links",
+                contexts: ["all"],
+                onclick: runContentScript,
+            });
         });
 
         /*

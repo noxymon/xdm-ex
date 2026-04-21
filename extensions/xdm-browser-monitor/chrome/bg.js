@@ -18,11 +18,7 @@
 
     var log = function (msg) {
         if (debug) {
-            try {
-                log(msg);
-            } catch (e) {
-                log(e + "");
-            }
+            console.log(msg);
         }
     }
 
@@ -157,8 +153,9 @@
 
     var runContentScript = function (info, tab) {
         log("running content script");
-        chrome.tabs.executeScript({
-            file: 'contentscript.js'
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['contentscript.js']
         });
     };
 
@@ -299,8 +296,10 @@
     };
 
     var isBlocked = function (url) {
+        var parsed = parseUrl(url);
+        if (!parsed) return false;
         for (var i = 0; i < blockedHosts.length; i++) {
-            var hostName = parseUrl(url).hostname;
+            var hostName = parsed.hostname;
             if (blockedHosts[i] == hostName) {
                 return true;
             }
@@ -339,7 +338,8 @@
     // };
 
     var getFileFromUrl = function (str) {
-        return ustr = parseUrl(str).pathname;
+        var parsed = parseUrl(str);
+        return parsed ? parsed.pathname : "";
     };
 
     var getFileFromContentDisposition = function (str) {
@@ -403,9 +403,9 @@
         }
 
         if (videoList && videoList.length > 0) {
-            chrome.browserAction.setBadgeText({ text: videoList.length + "" });
+            chrome.action.setBadgeText({ text: videoList.length + "" });
         } else {
-            chrome.browserAction.setBadgeText({ text: "" });
+            chrome.action.setBadgeText({ text: "" });
         }
     };
 
@@ -413,7 +413,7 @@
         if (lastIcon == icon) {
             return;
         }
-        chrome.browserAction.setIcon({ path: icon });
+        chrome.action.setIcon({ path: icon });
         lastIcon = icon;
     };
 
@@ -421,7 +421,7 @@
         if (lastPopup == pop) {
             return;
         }
-        chrome.browserAction.setPopup({ popup: pop });
+        chrome.action.setPopup({ popup: pop });
         lastPopup = pop;
     };
 
@@ -455,39 +455,73 @@
         //This will monitor and intercept files download if 
         //criteria matches and XDM is running
         //Use request array to get request headers
+        var recentlyIntercepted = new Set();
+
         chrome.webRequest.onHeadersReceived.addListener
             (
             function (response) {
                 var requests = removeRequest(response.requestId);
-                if (!isXDMUp) {
-                    return;
-                }
+                if (!isXDMUp) return;
+                if (!monitoring || disabled) return;
+                if (!(response.statusLine.indexOf("200") > 0 || response.statusLine.indexOf("206") > 0)) return;
 
-                if (!monitoring) {
-                    return;
-                }
-
-                if (disabled) {
-                    return;
-                }
-
-                if (!(response.statusLine.indexOf("200") > 0
-                    || response.statusLine.indexOf("206") > 0)) {
-                    return;
-                }
-
-                if (requests) {
-                    if (requests.length == 1) {
-                        if (!(response.url + "").startsWith(xdmHost)) {
-                            //console.log("processing request " + response.url);
-                            return processRequest(requests[0], response);
+                if (requests && requests.length == 1) {
+                    if (!(response.url + "").startsWith(xdmHost)) {
+                        var didIntercept = processRequest(requests[0], response);
+                        // If processRequest intercepted it, we track it to prevent dlInterceptor from duplicating
+                        if (didIntercept && didIntercept.cancel) {
+                            var u = response.url || "";
+                            recentlyIntercepted.add(u);
+                            setTimeout(function() { recentlyIntercepted.delete(u); }, 3000);
                         }
                     }
                 }
             },
             { urls: ["http://*/*", "https://*/*"] },
-            ["blocking", "responseHeaders"]
+            ["responseHeaders", "extraHeaders"]
             );
+
+        var dlInterceptor = function(item, suggest) {
+            if (monitoring && !disabled) {
+                var itemUrl = item.url || "";
+                if (!itemUrl.startsWith("http://") && !itemUrl.startsWith("https://")) {
+                    if (suggest) suggest();
+                    return;
+                }
+                var file = item.filename;
+                if (!file) {
+                    file = getFileFromUrl(item.url);
+                }
+                var ext = getFileExtension(file);
+                if (ext) {
+                    ext = ext.toUpperCase();
+                    var intercept = false;
+                    for (var i = 0; i < fileExts.length; i++) {
+                        if (fileExts[i] == ext) {
+                            intercept = true;
+                            break;
+                        }
+                    }
+                    if (intercept) {
+                        log("Intercepting download via downloads API: " + item.url);
+                        chrome.downloads.cancel(item.id);
+                        chrome.downloads.erase({ id: item.id });
+                        if (!recentlyIntercepted.has(itemUrl)) {
+                            sendUrlToXDM(item.url);
+                        }
+                        if (suggest) suggest();
+                        return;
+                    }
+                }
+            }
+            if (suggest) suggest();
+        };
+
+        if (chrome.downloads.onDeterminingFilename) {
+            chrome.downloads.onDeterminingFilename.addListener(dlInterceptor);
+        } else {
+            chrome.downloads.onCreated.addListener(function(item) { dlInterceptor(item, null); });
+        }
 
         //check XDM if is running and enable monitoring
         //setInterval(function () { syncXDM(); }, 5000);
@@ -536,22 +570,34 @@
             }
         });
 
-        chrome.contextMenus.create({
-            title: "Download with XDM",
-            contexts: ["link", "video", "audio"],
-            onclick: sendLinkToXDM,
+        chrome.runtime.onInstalled.addListener(function() {
+            chrome.contextMenus.create({
+                id: "xdm-link",
+                title: "Download with XDM",
+                contexts: ["link", "video", "audio"]
+            });
+
+            chrome.contextMenus.create({
+                id: "xdm-image",
+                title: "Download Image with XDM",
+                contexts: ["image"]
+            });
+
+            chrome.contextMenus.create({
+                id: "xdm-all",
+                title: "Download all links",
+                contexts: ["all"]
+            });
         });
 
-        chrome.contextMenus.create({
-            title: "Download Image with XDM",
-            contexts: ["image"],
-            onclick: sendImageToXDM,
-        });
-
-        chrome.contextMenus.create({
-            title: "Download all links",
-            contexts: ["all"],
-            onclick: runContentScript,
+        chrome.contextMenus.onClicked.addListener(function (info, tab) {
+            if (info.menuItemId === "xdm-link") {
+                sendLinkToXDM(info, tab);
+            } else if (info.menuItemId === "xdm-image") {
+                sendImageToXDM(info, tab);
+            } else if (info.menuItemId === "xdm-all") {
+                runContentScript(info, tab);
+            }
         });
 
 
@@ -576,7 +622,11 @@
                    }
                    updateBrowserAction();
 
-           log("Received: " + data);
+           log("Received: " + JSON.stringify(data));
+       });
+
+       port.onDisconnect.addListener(() => {
+           console.error("Disconnected from native host.", chrome.runtime.lastError ? chrome.runtime.lastError.message : "No error message");
        });
 
        /*

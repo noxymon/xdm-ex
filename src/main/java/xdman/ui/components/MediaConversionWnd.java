@@ -152,7 +152,7 @@ public class MediaConversionWnd extends JFrame implements ActionListener, MediaC
 		prg.setBounds(getScaledInt(20), getScaledInt(85), getScaledInt(350) - getScaledInt(40), getScaledInt(5));
 
 		statLbl = new JLabel();
-		statLbl.setForeground(Color.WHITE);
+		statLbl.setForeground(ColorResource.getDeepFontColor());
 		statLbl.setBounds(getScaledInt(20), getScaledInt(100), getScaledInt(350) - getScaledInt(40), getScaledInt(25));
 
 		titlePanel.add(titleLbl);
@@ -179,7 +179,7 @@ public class MediaConversionWnd extends JFrame implements ActionListener, MediaC
 	private void applyStyle(CustomButton btn) {
 		btn.addActionListener(this);
 		btn.setBackground(ColorResource.getDarkestBgColor());
-		btn.setForeground(Color.WHITE);
+		btn.setForeground(ColorResource.getDeepFontColor());
 		btn.setPressedBackground(ColorResource.getDarkerBgColor());
 		btn.setFont(FontResource.getBigFont());
 		btn.setBorderPainted(false);
