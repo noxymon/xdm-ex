@@ -22,25 +22,28 @@ func SpawnProcess() {
 	flags |= CreateNewProcessGroup
 	flags |= CreateNoWindow
 
-	path,err:=os.Executable()
-
-	// log.WriteString("path: "+path+"\n")
-
-
-	if err!=nil{
+	path, err := os.Executable()
+	if err != nil {
 		return
 	}
 
-	path=filepath.Dir(path)
+	dir := filepath.Dir(path)
+	parentDir := filepath.Dir(dir)
 
-	// log.WriteString("path: "+path+"\n")
+	jrePath := filepath.Join(dir, "jre", "bin", "javaw.exe")
+	jarPath := filepath.Join(dir, "xdman.jar")
 
-	// log.WriteString("path: "+"\""+path+"\\jre\\bin\\javaw.exe\" -jar \""+path+"\\xdman.jar\" -m"+"\n")
+	if _, err := os.Stat(jrePath); err != nil {
+		jrePath = filepath.Join(parentDir, "jre", "bin", "javaw.exe")
+	}
 
+	if _, err := os.Stat(jarPath); err != nil {
+		jarPath = filepath.Join(parentDir, "xdman.jar")
+	}
 
-	 syscall.CreateProcess(
-		nil,//syscall.StringToUTF16Ptr(""),
-		syscall.StringToUTF16Ptr("\""+path+"\\jre\\bin\\javaw.exe\" -jar \""+path+"\\xdman.jar\" -m"),
+	syscall.CreateProcess(
+		nil,
+		syscall.StringToUTF16Ptr("\""+jrePath+"\" -jar \""+jarPath+"\" -m"),
 		nil,
 		nil,
 		false,

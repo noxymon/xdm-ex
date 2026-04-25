@@ -265,6 +265,10 @@ func watchForSettingsChange(){
 }
 
 func main() {
+	if len(os.Args) == 1 {
+		SpawnProcess()
+		os.Exit(0)
+	}
 
 	//log, _ = os.Create("C:\\Users\\subhro\\Documents\\go-projects\\native-messaging\\log.txt")
 	//SpawnProcess()

@@ -1,0 +1,71 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package Name="Xtreme Download Manager" Manufacturer="XDM Team" Version="26.04.0" UpgradeCode="e3d6e5d2-1c2a-4c3e-8d2a-09254b9c50de" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="XDM">
+        <Directory Id="JreFolder" Name="jre" />
+        <Directory Id="NativeMessagingFolder" Name="native-messaging" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="XDM"/>
+    </StandardDirectory>
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="XdmAppExe" Guid="*">
+        <File Source="output-app\xdman\xdm-app.exe" KeyPath="yes" Checksum="yes">
+          <Shortcut Id="ApplicationStartMenuShortcut" Directory="ApplicationProgramsFolder" Name="Xtreme Download Manager" WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+        </File>
+      </Component>
+      <Component Id="XdmanJar" Guid="*">
+        <File Source="output-app\xdman\xdman.jar" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Native Messaging Files -->
+    <ComponentGroup Id="NativeMessagingComponents" Directory="NativeMessagingFolder">
+      <Component Id="NativeExe" Guid="*">
+        <File Source="output-app\xdman\native-messaging\native.exe" />
+      </Component>
+      <Component Id="XdmffHostExe" Guid="*">
+        <File Source="output-app\xdman\native-messaging\xdmff.native_host.exe" />
+      </Component>
+      <Component Id="XdmChromeHostExe" Guid="*">
+        <File Source="output-app\xdman\native-messaging\xdm_chrome.native_host.exe" />
+      </Component>
+      <Component Id="XdmffHostJson" Guid="*">
+        <File Source="output-app\xdman\native-messaging\xdmff.native_host.json" />
+      </Component>
+      <Component Id="XdmChromeHostJson" Guid="*">
+        <File Source="output-app\xdman\native-messaging\xdm_chrome.native_host.json" />
+      </Component>
+      <Component Id="NativeMessagingXdmanJar" Guid="*">
+        <File Source="output-app\xdman\native-messaging\xdman.jar" Name="xdman_native.jar" />
+      </Component>
+      <Component Id="NativeMessagingRegistryChrome" Guid="*">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Google\Chrome\NativeMessagingHosts\com.subhra.xdm" Value="[INSTALLFOLDER]native-messaging\xdm_chrome.native_host.json" Type="string" Action="write" />
+      </Component>
+      <Component Id="NativeMessagingRegistryEdge" Guid="*">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Microsoft\Edge\NativeMessagingHosts\com.subhra.xdm" Value="[INSTALLFOLDER]native-messaging\xdm_chrome.native_host.json" Type="string" Action="write" />
+      </Component>
+      <Component Id="NativeMessagingRegistryFirefox" Guid="*">
+        <RegistryValue Root="HKLM" Key="SOFTWARE\Mozilla\NativeMessagingHosts\com.subhra.xdm" Value="[INSTALLFOLDER]native-messaging\xdmff.native_host.json" Type="string" Action="write" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="MainFeature" Title="XDM" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="NativeMessagingComponents" />
+      <ComponentGroupRef Id="JreHarvestComponents" />
+      <Component Id="CleanupMainFolder" Directory="ApplicationProgramsFolder" Guid="*">
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\XDM" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </Feature>
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+  </Package>
+</Wix>
